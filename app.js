@@ -8,8 +8,8 @@
     to: { name: 'Казань', lat: 55.7961, lon: 49.1064 }
   };
   const markerStyles = {
-    from: 'background:#829354;box-shadow:0 0 0 5px #82935430',
-    to: 'background:#e1ad2e;box-shadow:0 0 0 5px #e1ad2e38'
+    from: 'background:#648496;box-shadow:0 0 0 5px #64849630',
+    to: 'background:#e4ad54;box-shadow:0 0 0 5px #e4ad5438'
   };
   const pages = [...document.querySelectorAll('.wizard-page')];
   const routeStatus = document.querySelector('#routeStatus');
@@ -179,7 +179,7 @@
 
       routeDistanceMeters = route.distance;
       const latlngs = route.geometry.coordinates.map(([lon, lat]) => [lat, lon]);
-      routeLine = L.polyline(latlngs, { color: '#657943', weight: 5, opacity: .98, smoothFactor: 0, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+      routeLine = L.polyline(latlngs, { color: '#648496', weight: 5, opacity: .98, smoothFactor: 0, lineCap: 'round', lineJoin: 'round' }).addTo(map);
       for (const [key, waypoint] of [['from', result.waypoints?.[0]], ['to', result.waypoints?.[1]]]) {
         const snapped = waypoint?.location;
         if (snapped && markers[key]) markers[key].setLatLng([snapped[1], snapped[0]]);
@@ -411,6 +411,27 @@
   });
   document.querySelector('.menu-toggle').addEventListener('click', () => document.querySelector('.nav').classList.toggle('open'));
   document.querySelectorAll('.nav a').forEach(link => link.addEventListener('click', () => document.querySelector('.nav').classList.remove('open')));
+
+  const driveSection = document.querySelector('#drive');
+  const driveCar = document.querySelector('#driveCar');
+  const driveProgress = document.querySelector('#driveProgress');
+  let driveFrame = 0;
+  function updateDriveAnimation() {
+    driveFrame = 0;
+    if (!driveSection || !driveCar) return;
+    const scrollRange = Math.max(1, driveSection.offsetHeight - window.innerHeight);
+    const progress = Math.min(1, Math.max(0, -driveSection.getBoundingClientRect().top / scrollRange));
+    const horizontalPosition = 82 - progress * 164;
+    const verticalPosition = Math.sin(progress * Math.PI) * -18;
+    driveCar.style.transform = `translate3d(${horizontalPosition}%, ${verticalPosition}px, 0)`;
+    if (driveProgress) driveProgress.style.width = `${progress * 100}%`;
+  }
+  function scheduleDriveAnimation() {
+    if (!driveFrame) driveFrame = window.requestAnimationFrame(updateDriveAnimation);
+  }
+  window.addEventListener('scroll', scheduleDriveAnimation, { passive: true });
+  window.addEventListener('resize', scheduleDriveAnimation, { passive: true });
+  scheduleDriveAnimation();
 
   hydrateTripDetails();
   renderEstimate();
