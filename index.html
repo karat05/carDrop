@@ -28,12 +28,12 @@
         <a class="hero-cta" href="#calculator">Рассчитать поездку <span>↓</span></a>
         <div class="hero-proof"><div class="proof-icon">✳</div><div><b>50 ₽ за километр</b><small>Понятный тариф без сюрпризов</small></div></div>
       </div>
-      <div class="hero-art" aria-label="Тёмно-синий Renault Master 2020, 3D-визуализация">
+      <div class="hero-art" aria-label="Графитово-серый Renault Master 2020, 3D-визуализация">
         <div class="art-sun"></div><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
         <div class="route-label label-a"><i></i> ОТКУДА</div><div class="route-label label-b"><i></i> КУДА</div>
         <div class="van-platform"><span></span></div>
-        <img class="van-illustration" src="assets/renault-master-2020-3d.png" alt="Тёмно-синий Renault Master 2020, цельнометаллический фургон" />
-        <div class="art-caption"><span class="caption-number">01</span><span>Renault Master<br />2020 · тёмно-синий</span><span class="caption-arrow">↗</span></div>
+        <img class="van-illustration" src="assets/renault-master-2020-3d.png" alt="Графитово-серый Renault Master 2020, цельнометаллический фургон" />
+        <div class="art-caption"><span class="caption-number">01</span><span>Renault Master<br />2020 · графитовый</span><span class="caption-arrow">↗</span></div>
       </div>
       <div class="hero-bottom"><span>ЛЮБОЕ РАССТОЯНИЕ</span><span class="bottom-dash"></span><span>ДО 2 ТОНН</span><span class="bottom-dash"></span><span>ПО ВСЕЙ РОССИИ</span></div>
     </section>
@@ -66,6 +66,26 @@
             <div class="helpers-stepper" aria-label="Количество грузчиков"><button type="button" id="helpersMinus" aria-label="Уменьшить количество грузчиков">−</button><output id="helpersCount" aria-live="polite">0</output><button type="button" id="helpersPlus" aria-label="Увеличить количество грузчиков">+</button></div>
             <div class="helpers-note" id="helpersNote">Не нужны</div>
           </div>
+          <details class="trip-details">
+            <summary>Добавить детали груза и адресов</summary>
+            <p class="trip-details-intro">Поля необязательные. Данные останутся в этом браузере; доплаты согласуются отдельно.</p>
+            <label class="detail-field detail-wide">Что перевозим?<input type="text" data-trip-detail="cargo" placeholder="Например, мебель и коробки" maxlength="100" /></label>
+            <div class="detail-grid">
+              <label class="detail-field">Вес, кг<input type="number" data-trip-detail="weight" min="0" max="2000" step="10" placeholder="до 2000" /></label>
+              <label class="detail-field">Объём, м³<input type="number" data-trip-detail="volume" min="0" max="30" step="0.5" placeholder="примерно" /></label>
+              <label class="detail-field">Этаж погрузки<input type="number" data-trip-detail="fromFloor" min="0" max="100" step="1" placeholder="0 — первый" /></label>
+              <label class="detail-field">Этаж выгрузки<input type="number" data-trip-detail="toFloor" min="0" max="100" step="1" placeholder="0 — первый" /></label>
+            </div>
+            <div class="detail-checks">
+              <label><input type="checkbox" data-trip-detail="fromLift" /> Есть лифт при погрузке</label>
+              <label><input type="checkbox" data-trip-detail="toLift" /> Есть лифт при выгрузке</label>
+            </div>
+            <label class="detail-field detail-wide">Желаемая дата поездки<input type="date" data-trip-detail="date" /></label>
+            <label class="detail-field detail-wide">Комментарий<textarea data-trip-detail="comment" maxlength="500" rows="3" placeholder="Хрупкие вещи, крупногабаритные предметы и другие пожелания"></textarea></label>
+            <div class="trip-summary-label">Детали для заявки</div>
+            <div class="trip-summary" id="detailsSummary" aria-live="polite">Груз, этажи и дата пока не указаны</div>
+            <button type="button" id="clearTripDetails" class="clear-details">Очистить детали</button>
+          </details>
           <a class="order-button" href="#calculator">Рассчитать маршрут <span>↗</span></a>
           <div class="estimate-badges"><span>✓ До 2 т</span><span>✓ Любое расстояние</span></div>
         </aside>
@@ -73,7 +93,7 @@
     </section>
 
     <section class="van-section" id="van">
-      <div class="van-photo-side"><div class="van-photo-frame"><div class="photo-tag">НАШ АВТОМОБИЛЬ <span>01 / 01</span></div><div class="van-photo-art"><div class="photo-sun"></div><img class="van-photo-3d" src="assets/renault-master-2020-3d.png" alt="3D-визуализация тёмно-синего Renault Master 2020" /><div class="photo-ground"></div></div></div></div>
+      <div class="van-photo-side"><div class="van-photo-frame"><div class="photo-tag">НАШ АВТОМОБИЛЬ <span>01 / 01</span></div><div class="van-photo-art"><div class="photo-sun"></div><img class="van-photo-3d" src="assets/renault-master-2020-3d.png" alt="3D-визуализация графитово-серого Renault Master 2020" /><div class="photo-ground"></div></div></div></div>
       <div class="van-copy"><div class="eyebrow"><span class="eyebrow-line"></span> ПРОСТРАНСТВО ДЛЯ ВАЖНОГО</div><h2 id="van-title">Всё поместится.<br /><span>И доедет.</span></h2><p>Цельнометаллический фургон Renault Master 2020 года — для переезда, мебели, техники и коммерческих грузов.</p><div class="spec-grid"><div class="spec"><b>до 2<span> т</span></b><small>грузоподъёмность</small></div><div class="spec"><b>3,7<span> м</span></b><small>длина кузова</small></div><div class="spec"><b>2,2<span> м</span></b><small>высота кузова</small></div><div class="spec"><b>1,7<span> м</span></b><small>ширина кузова</small></div></div><div class="van-note"><span>↳</span> Любое расстояние — от соседнего района до другого края России</div></div>
     </section>
 

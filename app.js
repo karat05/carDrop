@@ -75,7 +75,9 @@
     if (token !== routeToken) return;
 
     const coords = `${points.from.lon},${points.from.lat};${points.to.lon},${points.to.lat}`;
-    const url = `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coords}?overview=simplified&geometries=geojson&alternatives=false&steps=false`;
+    // Keep every road vertex from OSRM: the simplified overview can cut across
+    // bends and look like an arbitrary line at the map's current zoom.
+    const url = `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coords}?overview=full&geometries=geojson&alternatives=false&steps=false`;
     lastRouteRequestAt = Date.now();
     try {
       const response = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
@@ -87,7 +89,11 @@
 
       routeDistanceMeters = route.distance;
       const latlngs = route.geometry.coordinates.map(([lon, lat]) => [lat, lon]);
-      routeLine = L.polyline(latlngs, { color: '#879652', weight: 4, opacity: .95 }).addTo(map);
+      routeLine = L.polyline(latlngs, { color: '#657943', weight: 5, opacity: .98, smoothFactor: 0, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+      for (const [key, waypoint] of [['from', result.waypoints?.[0]], ['to', result.waypoints?.[1]]]) {
+        const snapped = waypoint?.location;
+        if (snapped && markers[key]) markers[key].setLatLng([snapped[1], snapped[0]]);
+      }
       renderEstimate();
       setRouteStatus('Автомобильный маршрут построен', 'success');
     } catch {
@@ -260,6 +266,38 @@
   }
   document.querySelector('#helpersMinus').addEventListener('click', () => { helpers = Math.max(0, helpers - 1); renderHelpers(); });
   document.querySelector('#helpersPlus').addEventListener('click', () => { helpers = Math.min(6, helpers + 1); renderHelpers(); });
+
+  const tripFields = [...document.querySelectorAll('[data-trip-detail]')];
+  const detailsSummary = document.querySelector('#detailsSummary');
+  function renderTripDetails() {
+    const values = Object.fromEntries(tripFields.map(field => [field.dataset.tripDetail, field.type === 'checkbox' ? field.checked : field.value.trim()]));
+    const cargo = [values.cargo, values.weight ? `${values.weight} кг` : '', values.volume ? `${values.volume} м³` : ''].filter(Boolean).join(' · ');
+    const floors = [values.fromFloor ? `погрузка: ${values.fromFloor} эт.` : '', values.toFloor ? `выгрузка: ${values.toFloor} эт.` : ''].filter(Boolean).join(' · ');
+    const lifts = [values.fromLift ? 'лифт на погрузке' : '', values.toLift ? 'лифт на выгрузке' : ''].filter(Boolean).join(' · ');
+    const details = [cargo, floors, lifts, values.date ? `дата: ${new Intl.DateTimeFormat('ru-RU').format(new Date(`${values.date}T12:00:00`))}` : '', values.comment ? `комментарий: ${values.comment}` : ''].filter(Boolean);
+    detailsSummary.textContent = details.join(' · ') || 'Груз, этажи и дата пока не указаны';
+  }
+  for (const field of tripFields) {
+    const saved = localStorage.getItem(`cardrop-trip-${field.dataset.tripDetail}`);
+    if (saved !== null) field.type === 'checkbox' ? field.checked = saved === 'true' : field.value = saved;
+    field.addEventListener('input', () => {
+      localStorage.setItem(`cardrop-trip-${field.dataset.tripDetail}`, field.type === 'checkbox' ? String(field.checked) : field.value);
+      renderTripDetails();
+    });
+    field.addEventListener('change', () => {
+      localStorage.setItem(`cardrop-trip-${field.dataset.tripDetail}`, field.type === 'checkbox' ? String(field.checked) : field.value);
+      renderTripDetails();
+    });
+  }
+  document.querySelector('#clearTripDetails').addEventListener('click', () => {
+    for (const field of tripFields) {
+      localStorage.removeItem(`cardrop-trip-${field.dataset.tripDetail}`);
+      if (field.type === 'checkbox') field.checked = false;
+      else field.value = '';
+    }
+    renderTripDetails();
+  });
+  renderTripDetails();
   document.querySelector('.menu-toggle').addEventListener('click', () => document.querySelector('.nav').classList.toggle('open'));
   document.querySelectorAll('.nav a').forEach(link => link.addEventListener('click', () => document.querySelector('.nav').classList.remove('open')));
 
