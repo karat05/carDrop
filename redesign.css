@@ -27,3 +27,5 @@ html,body{overflow-x:clip}body{width:100%}.hero-art,.ambient-bg{contain:paint;ov
 .hero:before{content:"";position:absolute;z-index:0;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);pointer-events:none;background:radial-gradient(ellipse at 75% 54%,#76539b30,transparent 39%),radial-gradient(ellipse at 25% 88%,#1c63702a,transparent 45%),linear-gradient(180deg,transparent 76%,#1010194d)}.hero-copy{z-index:2}.hero-art{z-index:1;overflow:visible;contain:none;isolation:isolate}.hero-art::before{content:"";position:absolute;z-index:-1;pointer-events:none;top:-6%;bottom:-6%;left:calc(50% - 50vw - 600px);width:calc(100vw + 1200px);background:radial-gradient(ellipse at 50% 52%,#8b65b72d 0 17%,#8b65b712 43%,transparent 70%),linear-gradient(180deg,transparent 42%,#8b65b70b 58%,transparent 100%)}
 .scene-city{height:115%;top:-15%}.scene-trees{height:116%;top:-8%}
 @media(max-width:760px){.scene-city{height:315px;top:-35px}.scene-trees{height:305px;top:-35px}}
+.scene-city{translate:0 -14px}.scene-trees{translate:0 -30px}
+@media(max-width:760px){.scene-city{translate:0 -10px}.scene-trees{translate:0 -22px}}
