@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b0c12" />
-  <meta name="description" content="Рассчитайте базовую стоимость перевозки вещей по России на Renault Master 2020. Точную цену и дату согласуйте напрямую в MAX." />
+  <meta name="description" content="Узнайте примерную стоимость перевозки вещей по России на Renault Master 2020. Услуги и точную цену согласуйте напрямую в MAX." />
   <title>Перевезём — перевозка вещей по России</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -70,10 +70,10 @@
             <div class="cargo-fields">
               <label class="detail-field detail-wide">Что перевозим?<input type="text" data-trip-detail="cargo" placeholder="Например, мебель и коробки" maxlength="100" /></label>
               <div class="detail-grid">
-                <label class="detail-field">Вес, кг<input type="number" data-trip-detail="weight" min="0" max="2000" step="10" placeholder="до 2000" /></label>
-                <label class="detail-field">Объём, м³<input type="number" data-trip-detail="volume" min="0" max="30" step="0.5" placeholder="примерно" /></label>
+                <label class="detail-field">Вес, кг<input type="number" data-trip-detail="weight" min="0" max="2000" step="10" placeholder="Необязательно" /></label>
+                <label class="detail-field">Объём, м³<input type="number" data-trip-detail="volume" min="0" max="30" step="0.5" placeholder="Необязательно" /></label>
               </div>
-              <label class="detail-field detail-wide">Грузчики<select id="helpersSelect" data-trip-detail="helpers"><option value="0">Не нужны</option><option value="1">1 грузчик</option><option value="2">2 грузчика</option><option value="3">3 грузчика</option><option value="4">4 грузчика</option><option value="5">5 грузчиков</option><option value="6">6 грузчиков</option></select></label>
+              <label class="detail-field detail-wide">Грузчики<select id="helpersSelect" data-trip-detail="helpers"><option value="0">Не нужны</option><option value="1">1 грузчик</option><option value="2">2 грузчика</option><option value="3">3 грузчика</option></select></label>
               <div class="detail-grid">
                 <label class="detail-field">Этаж погрузки<select data-trip-detail="fromFloor"><option value="">Не указан</option><option value="0">Первый этаж / без подъёма</option><option value="2">2-й этаж</option><option value="3">3-й этаж</option><option value="4">4-й этаж</option><option value="5">5-й этаж</option><option value="6">6-й этаж</option><option value="7">7-й этаж</option><option value="8">8-й этаж</option><option value="9">9-й этаж</option><option value="10">10-й этаж и выше</option></select></label>
                 <label class="detail-field">Этаж выгрузки<select data-trip-detail="toFloor"><option value="">Не указан</option><option value="0">Первый этаж / без подъёма</option><option value="2">2-й этаж</option><option value="3">3-й этаж</option><option value="4">4-й этаж</option><option value="5">5-й этаж</option><option value="6">6-й этаж</option><option value="7">7-й этаж</option><option value="8">8-й этаж</option><option value="9">9-й этаж</option><option value="10">10-й этаж и выше</option></select></label>
@@ -82,9 +82,16 @@
                 <label><input type="checkbox" data-trip-detail="fromLift" /> Есть лифт при погрузке</label>
                 <label><input type="checkbox" data-trip-detail="toLift" /> Есть лифт при выгрузке</label>
               </div>
-              <label class="detail-field detail-wide">Желаемая дата поездки<input type="date" data-trip-detail="date" /></label>
+              <div class="detail-grid lift-type-grid">
+                <label class="detail-field lift-type-panel" data-lift-panel="from" hidden>Лифт при погрузке<select data-trip-detail="fromLiftType" disabled><option value="">Выберите тип</option><option value="passenger">Обычный пассажирский</option><option value="cargo">Грузовой</option></select></label>
+                <label class="detail-field lift-type-panel" data-lift-panel="to" hidden>Лифт при выгрузке<select data-trip-detail="toLiftType" disabled><option value="">Выберите тип</option><option value="passenger">Обычный пассажирский</option><option value="cargo">Грузовой</option></select></label>
+              </div>
+              <div class="detail-grid date-time-grid">
+                <label class="detail-field">Желаемая дата поездки<input type="date" data-trip-detail="date" /></label>
+                <label class="detail-field">Удобное время подачи<input type="time" data-trip-detail="time" /></label>
+              </div>
               <label class="detail-field detail-wide">Комментарий<textarea data-trip-detail="comment" maxlength="500" rows="3" placeholder="Хрупкие вещи, крупногабаритные предметы и другие пожелания"></textarea></label>
-              <p class="rates-note">Грузчики и подъём на этаж оплачиваются отдельно по согласованной ставке. Сайт пока показывает только базовую стоимость маршрута.</p>
+              <p class="rates-note">Сейчас показана предварительная стоимость дороги по тарифу 50 ₽/км. Грузчики и дополнительные условия, включая этажи и лифты, согласуем в MAX.</p>
             </div>
             <div class="wizard-actions"><button type="button" class="wizard-button secondary" data-prev>← Назад</button><button type="button" id="nextToEstimate" class="wizard-button primary">Показать расчёт <span>→</span></button></div>
           </section>
@@ -93,12 +100,12 @@
             <div class="wizard-page-heading"><span>ШАГ 3 ИЗ 3</span><h3 id="step3Title">Ваша примерная стоимость</h3><p>Расчёт по дорожному маршруту. Без оплаты и автоматического бронирования.</p></div>
             <div class="final-depot">Старт: улица Пески Набережные, 1, Александров</div><div class="final-route"><span id="finalRouteFrom">Москва</span><span class="final-route-arrow">→</span><span id="finalRouteTo">Казань</span></div>
             <div class="leg-summary"><span>База → погрузка <b data-route-leg="pickup">— км</b></span><span>Погрузка → доставка <b data-route-leg="delivery">— км</b></span><small>Возвращение на базу в расчёт не включено.</small></div>
-            <div class="final-price-card"><span>БАЗОВАЯ ОЦЕНКА</span><strong id="finalPrice">— ₽</strong><small><span id="finalDistance">— км</span> × 50 ₽/км</small></div>
+            <div class="final-price-card"><span>ПРИМЕРНАЯ ЦЕНА ДО СОГЛАСОВАНИЯ УСЛУГ</span><strong id="finalPrice">— ₽</strong><small><span id="finalDistance">— км</span> × 50 ₽/км</small></div>
             <div class="final-details" id="finalDetails"></div><label class="message-label" for="messagePreview">Готовый текст для MAX</label><textarea id="messagePreview" class="message-preview" readonly rows="10"></textarea>
-            <p class="final-disclaimer">Это предварительная оценка только за маршрут. Стоимость грузчиков, подъёма и другие условия подтвердим в MAX. Поездка не считается заказанной, пока вы лично не согласуете её с владельцем.</p>
-            <a id="maxCta" class="max-cta" href="https://max.ru/:share?text=Здравствуйте%21%20Хочу%20уточнить%20расчёт%20перевозки." target="_blank" rel="noreferrer">Написать в MAX для точного расчёта <span>↗</span></a>
-            <p class="max-hint">Откроется MAX с готовым текстом. Вы сможете проверить его, выбрать чат и отправить.</p>
-            <div class="wizard-actions"><button type="button" class="wizard-button secondary" data-prev>← Изменить детали</button><button type="button" id="editRoute" class="text-button">Изменить маршрут</button></div>
+            <p class="final-disclaimer">Это примерная стоимость дороги, рассчитанная по километражу. Услуги грузчиков и другие условия пока не включены — итог уточним по всем деталям в MAX. Поездка не считается заказанной, пока вы лично не согласуете её с владельцем.</p>
+            <a id="maxCta" class="max-cta" href="https://max.ru/:share?text=Здравствуйте%21%20Хочу%20уточнить%20расчёт%20перевозки." target="_blank" rel="noreferrer">Открыть MAX и написать Роману <span>↗</span></a>
+            <p class="max-hint">В MAX найдите Романа по номеру <b>+7 916 349-07-15</b>. Текст заявки будет подготовлен для отправки.</p>
+            <div class="wizard-actions"><button type="button" class="wizard-button secondary" data-prev>← Изменить детали</button><button type="button" id="editRoute" class="wizard-button secondary">Изменить маршрут →</button></div>
           </section>
         </div>
         <aside class="estimate-card" id="estimateCard">
@@ -107,11 +114,11 @@
           <div class="leg-summary"><span>До погрузки <b data-route-leg="pickup">— км</b></span><span>С грузом <b data-route-leg="delivery">— км</b></span><small>Возвращение на базу не включено.</small></div>
           <div class="estimate-separator"></div>
           <div class="estimate-distance"><span>Всего по дорогам</span><b id="distanceValue">— км</b></div>
-          <div class="estimate-distance"><span>Базовый тариф</span><b>50 ₽ <small>/ км</small></b></div>
-          <div class="estimate-price-label">БАЗОВАЯ ОЦЕНКА</div>
+          <div class="estimate-distance"><span>Тариф за дорогу</span><b>50 ₽ <small>/ км</small></b></div>
+          <div class="estimate-price-label">ПРИМЕРНАЯ ЦЕНА ДО СОГЛАСОВАНИЯ УСЛУГ</div>
           <div class="estimate-price" id="priceValue">— <span>₽</span></div>
-          <div class="estimate-disclaimer">Дополнительные услуги и точную цену согласуем напрямую в MAX. Сайт не принимает оплату и не бронирует автомобиль.</div>
-          <div class="estimate-mini-details" id="estimateDetails">Маршрут ещё не рассчитан</div><div class="summary-note"><b>Всё в одном сообщении</b><p>Маршрут, груз, этажи и дата автоматически собираются в заявку. Скопируйте её кнопкой над формой и вставьте в чат MAX.</p></div>
+          <div class="estimate-disclaimer">Сумма рассчитана только по дороге. Грузчики, этажи и типы лифтов согласуем отдельно в MAX. Сайт не принимает оплату и не бронирует автомобиль.</div>
+          <div class="estimate-mini-details" id="estimateDetails">Маршрут ещё не рассчитан</div><div class="summary-note"><b>Всё в одном сообщении</b><p>В заявке соберутся маршрут, груз, вес и объём, грузчики, этажи, типы лифтов, дата, время и комментарий. Скопируйте текст и отправьте Роману в MAX.</p></div>
           <div class="estimate-badges"><span>✓ До 2 т</span><span>✓ По России</span></div>
         </aside>
       </div>
@@ -121,7 +128,7 @@
       <div class="vehicle-image"><span class="eyebrow">ВАШ АВТОМОБИЛЬ</span><img src="assets/renault-master-2020-3d.png" alt="Графитовый Renault Master 2020" loading="lazy" /></div>
       <div class="vehicle-info"><div class="eyebrow">ОДИН ФУРГОН ДЛЯ ВАШИХ ЗАДАЧ</div><h2>Переезд, мебель<br />или важный груз.</h2><p>Цельнометаллический Renault Master 2020. По городу и между городами — на любое расстояние.</p><div class="vehicle-specs"><div><b>2 т</b><span>до · грузоподъёмность</span></div><div><b>3,7 × 2,2 × 1,7 м</b><span>длина × высота × ширина кузова</span></div></div></div>
     </section>
-    <section class="handoff-section" id="max-contact"><div class="handoff-head"><div class="eyebrow">ОТ РАСЧЁТА К ПОЕЗДКЕ</div><h2>Договоримся<br /><span>в MAX.</span></h2><a class="hero-cta" href="#calculator">Собрать заявку <span>↗</span></a></div><div class="handoff-grid" id="steps"><article><span>01 / МАРШРУТ</span><h3>Узнайте ориентир</h3><p>Выберите адреса. Покажем дорожный маршрут и цену по 50 ₽ за километр.</p></article><article><span>02 / ДЕТАЛИ</span><h3>Скопируйте всю заявку</h3><p>На втором шаге укажите груз, этажи, лифты и дату. Одна кнопка соберёт данные со всех шагов.</p></article><article><span>03 / ЛИЧНЫЙ ЧАТ</span><h3>Уточните и согласуйте</h3><p>Вставьте заявку в MAX, приложите фото вещей и согласуйте цену и время подачи напрямую.</p></article></div></section>
+    <section class="handoff-section" id="max-contact"><div class="handoff-head"><div class="eyebrow">ОТ РАСЧЁТА К ПОЕЗДКЕ</div><h2>Договоримся<br /><span>в MAX.</span></h2><a class="hero-cta" href="#calculator">Собрать заявку <span>↗</span></a></div><div class="handoff-grid" id="steps"><article><span>01 / МАРШРУТ</span><h3>Узнайте ориентир</h3><p>Выберите адреса. Покажем дорожный маршрут и цену по 50 ₽ за километр.</p></article><article><span>02 / ДЕТАЛИ</span><h3>Скопируйте всю заявку</h3><p>Укажите груз, грузчиков, этажи, типы лифтов, дату и время подачи. Одна кнопка соберёт всё в сообщение.</p></article><article><span>03 / ЛИЧНЫЙ ЧАТ</span><h3>Уточните и согласуйте</h3><p>Вставьте заявку в MAX, приложите фото вещей и согласуйте цену и время подачи напрямую.</p></article></div></section>
   </main>
   <footer><a class="brand footer-brand" href="#top"><span class="brand-mark">П</span><span>ПЕРЕВЕЗЁМ<span class="brand-dot">.</span></span></a><span>Перевозка вещей по России · Renault Master 2020</span><a href="#calculator">Рассчитать маршрут</a><span class="copyright">© 2026</span></footer>
   <script src="map-tiles.js"></script>

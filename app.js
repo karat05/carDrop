@@ -25,6 +25,8 @@
   const formatKm = value => new Intl.NumberFormat('ru-RU', { minimumFractionDigits: value % 1 > .05 ? 1 : 0, maximumFractionDigits: 1 }).format(value);
   const helperWord = count => count === 1 ? 'грузчик' : count >= 2 && count <= 4 ? 'грузчика' : 'грузчиков';
   const tripFields = [...document.querySelectorAll('[data-trip-detail]')];
+  const floorName = floor => floor === '' ? 'не указан' : floor === '0' ? '1 / без подъёма' : floor === '10' ? '10 и выше' : floor;
+  const liftName = (enabled, type) => !enabled ? 'без лифта' : type === 'cargo' ? 'грузовой лифт' : type === 'passenger' ? 'обычный пассажирский лифт' : 'тип не указан';
 
   const storage = {
     get(key) { try { return localStorage.getItem(`cardrop-trip-${key}`); } catch { return null; } },
@@ -79,9 +81,10 @@
     if (d.volume) lines.push(`Объём: ${d.volume} м³`);
     const helpers = Number(d.helpers || 0);
     lines.push(helpers ? `Грузчики: ${helpers} ${helperWord(helpers)}` : 'Без грузчиков');
-    if (d.fromFloor !== '') lines.push(`Этаж погрузки: ${d.fromFloor === '0' ? 'первый / без подъёма' : d.fromFloor === '10' ? '10-й и выше' : `${d.fromFloor}-й`}${d.fromLift ? ', есть лифт' : ', без лифта'}`);
-    if (d.toFloor !== '') lines.push(`Этаж выгрузки: ${d.toFloor === '0' ? 'первый / без подъёма' : d.toFloor === '10' ? '10-й и выше' : `${d.toFloor}-й`}${d.toLift ? ', есть лифт' : ', без лифта'}`);
+    if (d.fromFloor !== '' || d.fromLift) lines.push(`Погрузка: этаж ${floorName(d.fromFloor)}, ${liftName(d.fromLift, d.fromLiftType)}`);
+    if (d.toFloor !== '' || d.toLift) lines.push(`Выгрузка: этаж ${floorName(d.toFloor)}, ${liftName(d.toLift, d.toLiftType)}`);
     if (d.date) lines.push(`Дата: ${new Intl.DateTimeFormat('ru-RU').format(new Date(`${d.date}T12:00:00`))}`);
+    if (d.time) lines.push(`Время: ${d.time}`);
     if (d.comment) lines.push(`Комментарий: ${d.comment}`);
     return lines;
   }
@@ -91,6 +94,7 @@
     const base = routeDistanceMeters === null ? 'не рассчитана' : `${formatMoney(Math.round(routeDistanceMeters / 1000 * rate))} ₽`;
     const d = currentDetails();
     const date = d.date ? new Intl.DateTimeFormat('ru-RU').format(new Date(`${d.date}T12:00:00`)) : 'согласуем';
+    const time = d.time || 'согласуем';
     return [
       'ЗАЯВКА НА ПЕРЕВОЗКУ', '',
       '📍 МАРШРУТ', `Старт с базы: ${depot.name}`, `Погрузка: ${inputs.from.value.trim() || 'не указано'}`, `Доставка: ${inputs.to.value.trim() || 'не указано'}`,
@@ -99,11 +103,9 @@
       '📦 ГРУЗ И ПОГРУЗКА',
       `Что перевозим: ${d.cargo || 'уточню в чате'}`,
       `Вес: ${d.weight ? `${d.weight} кг` : 'не указан'} · Объём: ${d.volume ? `${d.volume} м³` : 'не указан'}`,
-      ...detailsLines().filter(line => !/^(Груз:|Вес:|Объём:|Дата:|Комментарий:|Этаж)/.test(line)),
-      `Погрузка: этаж ${d.fromFloor === '' ? 'не указан' : d.fromFloor === '0' ? '1 / без подъёма' : d.fromFloor === '10' ? '10 и выше' : d.fromFloor}; ${d.fromLift ? 'есть лифт' : 'без лифта'}`,
-      `Выгрузка: этаж ${d.toFloor === '' ? 'не указан' : d.toFloor === '0' ? '1 / без подъёма' : d.toFloor === '10' ? '10 и выше' : d.toFloor}; ${d.toLift ? 'есть лифт' : 'без лифта'}`, '',
-      '📅 ДАТА И ПОЖЕЛАНИЯ', `Желаемая дата: ${date}`, `Комментарий: ${d.comment || 'нет'}`, '',
-      '💰 ОЦЕНКА С САЙТА', `Базовая стоимость: ${base}`, 'Тариф: 50 ₽/км. Дополнительные услуги согласуем отдельно.', '',
+      ...detailsLines().filter(line => !/^(Груз:|Вес:|Объём:|Дата:|Время:|Комментарий:)/.test(line)), '',
+      '📅 ДАТА И ПОЖЕЛАНИЯ', `Желаемая дата: ${date}`, `Удобное время: ${time}`, `Комментарий: ${d.comment || 'нет'}`, '',
+      '💰 ПРИМЕРНАЯ ЦЕНА С САЙТА', `Ориентир за дорогу: ${base}`, 'Расчёт по тарифу 50 ₽/км. Грузчики и дополнительные услуги в сумму не включены — итог согласуем в MAX.', '',
       'Здравствуйте! Прошу уточнить итоговую стоимость и свободное время для перевозки.'
     ].join('\n');
   }
@@ -114,7 +116,8 @@
     document.querySelectorAll('[data-route-leg="pickup"]').forEach(el => el.textContent = routeLegs ? `${formatKm(routeLegs[0] / 1000)} км` : '— км');
     document.querySelectorAll('[data-route-leg="delivery"]').forEach(el => el.textContent = routeLegs ? `${formatKm(routeLegs[1] / 1000)} км` : '— км');
     const estimateDetails = detailsLines();
-    document.querySelector('#estimateDetails').textContent = estimateDetails.length > 1 ? estimateDetails.slice(0, 4).join(' · ') : 'Укажите условия груза на следующем шаге';
+    const visibleDetails = estimateDetails.filter(line => !line.startsWith('Комментарий:')).slice(0, 8);
+    document.querySelector('#estimateDetails').textContent = visibleDetails.length ? visibleDetails.join(' · ') : 'Укажите условия груза на следующем шаге';
     document.querySelector('#messagePreview').value = createMaxMessage();
     const share = new URL(maxShareUrl); share.searchParams.set('text', createMaxMessage()); document.querySelector('#maxCta').href = share.toString();
     const canRoute = routeDistanceMeters !== null;
@@ -359,9 +362,26 @@
     if (dateField.value && dateField.value < localDate) { dateField.value = ''; storage.set('date', ''); }
   }
 
+  function syncLiftType(side, clearWhenHidden = false) {
+    const checkbox = document.querySelector(`[data-trip-detail="${side}Lift"]`);
+    const select = document.querySelector(`[data-trip-detail="${side}LiftType"]`);
+    const panel = select.closest('.lift-type-panel');
+    panel.hidden = !checkbox.checked;
+    select.disabled = !checkbox.checked;
+    if (!checkbox.checked && clearWhenHidden) {
+      select.value = '';
+      storage.set(`${side}LiftType`, '');
+      renderEstimate();
+    }
+  }
+
   function hydrateTripDetails() {
     for (const field of tripFields) {
-      const saved = storage.get(field.dataset.tripDetail);
+      let saved = storage.get(field.dataset.tripDetail);
+      if (field.dataset.tripDetail === 'helpers' && Number(saved) > 3) {
+        saved = '3';
+        storage.set('helpers', saved);
+      }
       if (saved !== null) field.type === 'checkbox' ? field.checked = saved === 'true' : field.value = saved;
       field.addEventListener('input', () => {
         storage.set(field.dataset.tripDetail, field.type === 'checkbox' ? String(field.checked) : field.value);
@@ -371,7 +391,13 @@
         storage.set(field.dataset.tripDetail, field.type === 'checkbox' ? String(field.checked) : field.value);
         renderEstimate();
       });
+      if (field.dataset.tripDetail === 'fromLift' || field.dataset.tripDetail === 'toLift') {
+        const side = field.dataset.tripDetail === 'fromLift' ? 'from' : 'to';
+        field.addEventListener('change', () => syncLiftType(side, true));
+      }
     }
+    syncLiftType('from', true);
+    syncLiftType('to', true);
     setDateMinimum();
   }
 
@@ -416,6 +442,16 @@
 
   document.querySelectorAll('[data-prev]').forEach(button => button.addEventListener('click', () => showStep(currentStep - 1)));
   document.querySelector('#nextToEstimate').addEventListener('click', () => {
+    for (const side of ['from', 'to']) {
+      const checkbox = document.querySelector(`[data-trip-detail="${side}Lift"]`);
+      const type = document.querySelector(`[data-trip-detail="${side}LiftType"]`);
+      if (checkbox.checked && !type.value) {
+        type.setCustomValidity('Выберите тип лифта.');
+        type.reportValidity();
+        return;
+      }
+      type.setCustomValidity('');
+    }
     const dateField = document.querySelector('[data-trip-detail="date"]');
     if (dateField.value && dateField.value < dateField.min) {
       dateField.setCustomValidity('Выберите сегодняшнюю или будущую дату.');
