@@ -155,6 +155,12 @@
 
   function showStep(step, scroll = true) {
     currentStep = step;
+    const copyAction = document.querySelector('#copyAction');
+    copyAction.hidden = step === 1;
+    document.querySelector('#quoteToolbarMessage').textContent = step === 1
+      ? 'Заполните маршрут и детали — после этого можно будет скопировать заявку'
+      : 'Одна заявка для MAX или WhatsApp';
+    if (step === 1) document.querySelector('#copyStatus').textContent = '';
     for (const page of pages) {
       const active = Number(page.dataset.page) === step;
       page.hidden = !active;
