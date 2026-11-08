@@ -46,7 +46,10 @@
       return anchor;
     };
     logo.addTo(map);
-    activeLayer = L.tileLayer(yandexTileUrl(key), { ...common, maxZoom: 20, attribution: yandexAttribution });
+    activeLayer = L.tileLayer(yandexTileUrl(key), {
+      ...common, maxZoom: 20, attribution: yandexAttribution,
+      referrerPolicy: 'strict-origin-when-cross-origin'
+    });
     // Invalid key, denied domain, quota or network failure must not leave a blank map.
     activeLayer.on('tileerror', function () { useOsm('tile-error'); });
     activeLayer.addTo(map);
