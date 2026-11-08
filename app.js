@@ -16,6 +16,31 @@
 
   const iconFor = key => L.divIcon({ className: '', html: `<span style="display:block;width:14px;height:14px;border:3px solid #f7f5ed;border-radius:50%;${markerStyles[key]}"></span>`, iconSize: [14, 14], iconAnchor: [7, 7] });
   const displayName = address => address.city || address.town || address.village || address.municipality || address.county || '';
+  const localityFromPhoton = p => p.city || p.locality || p.district || p.county || p.state || '';
+  function placeLabel(place) {
+    const address = place.address || place.properties || {};
+    const street = address.road || address.pedestrian || address.residential || address.street || address.name || '';
+    const house = address.house_number || address.housenumber || '';
+    const locality = displayName(address) || localityFromPhoton(address);
+    const streetAddress = [street, house].filter(Boolean).join(', ');
+    if (streetAddress && locality && !streetAddress.toLowerCase().includes(locality.toLowerCase())) return `${streetAddress}, ${locality}`;
+    if (streetAddress) return streetAddress;
+    if (locality) return locality;
+    return place.display_name || place.properties?.name || place.name || 'Выбранная точка';
+  }
+
+  function normalizePhoton(feature) {
+    const p = feature.properties || {};
+    const [lon, lat] = feature.geometry?.coordinates || [];
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+    const address = {
+      road: p.street || '', house_number: p.housenumber || '', city: p.city || p.locality || '',
+      town: p.city || p.locality || '', village: p.city || p.locality || '', district: p.district || '',
+      county: p.county || '', state: p.state || ''
+    };
+    const parts = [p.name, p.street && p.street !== p.name ? p.street : '', p.housenumber, p.city || p.locality, p.state].filter(Boolean);
+    return { lat: String(lat), lon: String(lon), address, display_name: [...new Set(parts)].join(', '), name: p.name || '' };
+  }
 
   function setRouteStatus(message, kind = '') {
     routeStatus.textContent = message;
@@ -89,10 +114,23 @@
   }
 
   async function geocode(query) {
-    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&addressdetails=1&countrycodes=ru&q=${encodeURIComponent(query)}`;
-    const response = await fetch(url, { headers: { 'Accept-Language': 'ru' } });
-    if (!response.ok) throw new Error('Не удалось выполнить поиск');
-    return response.json();
+    const encoded = encodeURIComponent(query);
+    const photonUrl = `https://photon.komoot.io/api/?q=${encoded}&lang=ru&limit=8&lat=${points.from.lat}&lon=${points.from.lon}&countrycode=RU`;
+    const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&addressdetails=1&countrycodes=ru&q=${encoded}`;
+    const responses = await Promise.allSettled([
+      fetch(photonUrl, { headers: { 'Accept-Language': 'ru' }, signal: AbortSignal.timeout(7000) }).then(r => { if (!r.ok) throw new Error(); return r.json(); }),
+      fetch(nominatimUrl, { headers: { 'Accept-Language': 'ru' }, signal: AbortSignal.timeout(9000) }).then(r => { if (!r.ok) throw new Error(); return r.json(); })
+    ]);
+    const photon = responses[0].status === 'fulfilled' ? (responses[0].value.features || []).map(normalizePhoton).filter(Boolean) : [];
+    const nominatim = responses[1].status === 'fulfilled' ? responses[1].value : [];
+    const results = [...nominatim, ...photon];
+    const unique = new Map();
+    for (const place of results) {
+      const key = `${Number(place.lat).toFixed(5)},${Number(place.lon).toFixed(5)}`;
+      if (!unique.has(key)) unique.set(key, place);
+    }
+    if (!unique.size && responses.every(r => r.status === 'rejected')) throw new Error('Не удалось выполнить поиск');
+    return [...unique.values()].slice(0, 8);
   }
 
   function showSuggestions(key, results) {
@@ -103,11 +141,12 @@
     }
     results.forEach(place => {
       const row = document.createElement('div'); row.className = 'suggestion';
-      const city = displayName(place.address) || place.name || place.display_name.split(',')[0];
-      row.textContent = `${city} · ${place.display_name.split(',').slice(1, 3).join(',').trim()}`;
+      const label = placeLabel(place);
+      row.textContent = place.display_name || label;
+      row.title = place.display_name || label;
       row.addEventListener('mousedown', event => {
         event.preventDefault();
-        setPoint(key, { name: city, lat: Number(place.lat), lon: Number(place.lon) }, true);
+        setPoint(key, { name: label, lat: Number(place.lat), lon: Number(place.lon) }, true);
         box.classList.remove('open'); clickNext = key === 'from' ? 'to' : 'from';
       });
       box.append(row);
@@ -124,8 +163,8 @@
     try {
       const results = await geocode(query);
       if (results.length) {
-        const place = results[0], city = displayName(place.address) || place.name || query;
-        setPoint(key, { name: city, lat: Number(place.lat), lon: Number(place.lon) }, true);
+        const place = results[0];
+        setPoint(key, { name: placeLabel(place), lat: Number(place.lat), lon: Number(place.lon) }, true);
         clickNext = key === 'from' ? 'to' : 'from';
       } else showSuggestions(key, []);
     } catch {
@@ -152,7 +191,7 @@
       setRouteStatus('Карта временно недоступна', 'error');
       return;
     }
-    map = L.map('map', { zoomControl: false, scrollWheelZoom: false }).setView([61.5, 93], 3);
+    map = L.map('map', { zoomControl: false, scrollWheelZoom: true, wheelPxPerZoomLevel: 100 }).setView([61.5, 93], 3);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>'
@@ -167,8 +206,8 @@
       try {
         const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${point.lat}&lon=${point.lon}&zoom=10&addressdetails=1`, { headers: { 'Accept-Language': 'ru' } });
         if (response.ok) {
-          const data = await response.json(), city = displayName(data.address);
-          if (city) setPoint(key, { ...point, name: city });
+          const data = await response.json(), label = placeLabel(data);
+          if (label) setPoint(key, { ...point, name: label });
         }
       } catch { /* Координаты точки уже сохранены и остаются доступны. */ }
     });
@@ -211,11 +250,23 @@
       clickNext = clickNext === 'from' ? 'to' : 'from';
     }, () => alert('Не удалось определить местоположение. Проверьте разрешение браузера.'));
   });
+  let helpers = 0;
+  const helperWord = count => count === 1 ? 'грузчик' : count >= 2 && count <= 4 ? 'грузчика' : 'грузчиков';
+  function renderHelpers() {
+    document.querySelector('#helpersCount').textContent = helpers;
+    document.querySelector('#helpersNote').textContent = helpers ? `${helpers} ${helperWord(helpers)}` : 'Не нужны';
+    document.querySelector('#helpersMinus').disabled = helpers === 0;
+    document.querySelector('#helpersPlus').disabled = helpers === 6;
+  }
+  document.querySelector('#helpersMinus').addEventListener('click', () => { helpers = Math.max(0, helpers - 1); renderHelpers(); });
+  document.querySelector('#helpersPlus').addEventListener('click', () => { helpers = Math.min(6, helpers + 1); renderHelpers(); });
   document.querySelector('.menu-toggle').addEventListener('click', () => document.querySelector('.nav').classList.toggle('open'));
   document.querySelectorAll('.nav a').forEach(link => link.addEventListener('click', () => document.querySelector('.nav').classList.remove('open')));
 
   renderEstimate();
+  renderHelpers();
   if (document.readyState === 'complete') initMap();
   else window.addEventListener('load', initMap, { once: true });
 })();
+
 
