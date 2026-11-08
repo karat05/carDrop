@@ -86,13 +86,21 @@
   function createMaxMessage() {
     const km = routeDistanceMeters === null ? 'не рассчитано' : `${formatKm(routeDistanceMeters / 1000)} км`;
     const base = routeDistanceMeters === null ? 'не рассчитана' : `${formatMoney(Math.round(routeDistanceMeters / 1000 * rate))} ₽`;
+    const d = currentDetails();
+    const date = d.date ? new Intl.DateTimeFormat('ru-RU').format(new Date(`${d.date}T12:00:00`)) : 'согласуем';
     return [
-      'Здравствуйте! Хочу уточнить расчёт перевозки.',
-      `Маршрут: ${points.from.name} — ${points.to.name}`,
-      `Расстояние: ${km}`,
-      `Примерная базовая стоимость: ${base}`,
-      ...detailsLines(),
-      'Понимаю, что точная стоимость и дата поездки подтверждаются отдельно в переписке.'
+      'ЗАЯВКА НА ПЕРЕВОЗКУ', '',
+      '📍 МАРШРУТ', `Откуда: ${inputs.from.value.trim() || 'не указано'}`, `Куда: ${inputs.to.value.trim() || 'не указано'}`,
+      `По дорогам: ${km}`, '',
+      '📦 ГРУЗ И ПОГРУЗКА',
+      `Что перевозим: ${d.cargo || 'уточню в чате'}`,
+      `Вес: ${d.weight ? `${d.weight} кг` : 'не указан'} · Объём: ${d.volume ? `${d.volume} м³` : 'не указан'}`,
+      ...detailsLines().filter(line => !/^(Груз:|Вес:|Объём:|Дата:|Комментарий:|Этаж)/.test(line)),
+      `Погрузка: этаж ${d.fromFloor === '' ? 'не указан' : d.fromFloor === '0' ? '1 / без подъёма' : d.fromFloor === '10' ? '10 и выше' : d.fromFloor}; ${d.fromLift ? 'есть лифт' : 'без лифта'}`,
+      `Выгрузка: этаж ${d.toFloor === '' ? 'не указан' : d.toFloor === '0' ? '1 / без подъёма' : d.toFloor === '10' ? '10 и выше' : d.toFloor}; ${d.toLift ? 'есть лифт' : 'без лифта'}`, '',
+      '📅 ДАТА И ПОЖЕЛАНИЯ', `Желаемая дата: ${date}`, `Комментарий: ${d.comment || 'нет'}`, '',
+      '💰 ОЦЕНКА С САЙТА', `Базовая стоимость: ${base}`, 'Тариф: 50 ₽/км. Дополнительные услуги согласуем отдельно.', '',
+      'Здравствуйте! Прошу уточнить итоговую стоимость и свободное время для перевозки.'
     ].join('\n');
   }
 
@@ -101,6 +109,8 @@
     document.querySelector('#estimateTo').textContent = points.to.name || 'Точка доставки';
     const estimateDetails = detailsLines();
     document.querySelector('#estimateDetails').textContent = estimateDetails.length > 1 ? estimateDetails.slice(0, 4).join(' · ') : 'Укажите условия груза на следующем шаге';
+    document.querySelector('#messagePreview').value = createMaxMessage();
+    const share = new URL(maxShareUrl); share.searchParams.set('text', createMaxMessage()); document.querySelector('#maxCta').href = share.toString();
     const canRoute = routeDistanceMeters !== null;
     nextRouteButton.disabled = !canRoute;
     if (!canRoute) {
@@ -412,26 +422,32 @@
   document.querySelector('.menu-toggle').addEventListener('click', () => document.querySelector('.nav').classList.toggle('open'));
   document.querySelectorAll('.nav a').forEach(link => link.addEventListener('click', () => document.querySelector('.nav').classList.remove('open')));
 
-  const driveSection = document.querySelector('#drive');
-  const driveCar = document.querySelector('#driveCar');
-  const driveProgress = document.querySelector('#driveProgress');
-  let driveFrame = 0;
-  function updateDriveAnimation() {
-    driveFrame = 0;
-    if (!driveSection || !driveCar) return;
-    const scrollRange = Math.max(1, driveSection.offsetHeight - window.innerHeight);
-    const progress = Math.min(1, Math.max(0, -driveSection.getBoundingClientRect().top / scrollRange));
-    const horizontalPosition = 82 - progress * 164;
-    const verticalPosition = Math.sin(progress * Math.PI) * -18;
-    driveCar.style.transform = `translate3d(${horizontalPosition}%, ${verticalPosition}px, 0)`;
-    if (driveProgress) driveProgress.style.width = `${progress * 100}%`;
+  document.querySelector('#copyQuote').addEventListener('click', async () => {
+    const message = createMaxMessage();
+    const status = document.querySelector('#copyStatus');
+    try {
+      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(message);
+      else {
+        const buffer = document.createElement('textarea'); buffer.value = message;
+        buffer.style.cssText = 'position:fixed;opacity:0'; document.body.append(buffer); buffer.select();
+        const copied = document.execCommand('copy'); buffer.remove(); if (!copied) throw new Error('copy failed');
+      }
+      status.textContent = 'Скопировано — вставьте в чат MAX';
+    } catch {
+      showStep(3); const preview = document.querySelector('#messagePreview'); preview.value = message; preview.focus(); preview.select();
+      status.textContent = 'Выделили текст — скопируйте его вручную';
+    }
+  });
+  let sceneFrame = 0;
+  function paintScene() {
+    sceneFrame = 0;
+    const progress = Math.min(1, window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight));
+    document.documentElement.style.setProperty('--page-progress', progress.toFixed(4));
+    document.documentElement.style.setProperty('--scene-shift', `${Math.min(window.scrollY * .17, 180)}px`);
+    document.documentElement.style.setProperty('--car-shift', `${-Math.min(window.scrollY * .09, 85)}px`);
   }
-  function scheduleDriveAnimation() {
-    if (!driveFrame) driveFrame = window.requestAnimationFrame(updateDriveAnimation);
-  }
-  window.addEventListener('scroll', scheduleDriveAnimation, { passive: true });
-  window.addEventListener('resize', scheduleDriveAnimation, { passive: true });
-  scheduleDriveAnimation();
+  window.addEventListener('scroll', () => { if (!sceneFrame) sceneFrame = requestAnimationFrame(paintScene); }, {passive:true});
+  paintScene();
 
   hydrateTripDetails();
   renderEstimate();

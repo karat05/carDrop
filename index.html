@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#f3f6f7" />
+  <meta name="theme-color" content="#0b0c12" />
   <meta name="description" content="Рассчитайте базовую стоимость перевозки вещей по России на Renault Master 2020. Точную цену и дату согласуйте напрямую в MAX." />
   <title>Перевезём — перевозка вещей по России</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="preconnect" href="https://tile.openstreetmap.org" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="redesign.css" />
 </head>
 <body>
+  <div class="ambient-bg" aria-hidden="true"><div class="ambient-orb"></div><div class="ambient-grid"></div></div>
   <header class="topbar">
     <a class="brand" href="#top" aria-label="Перевезём — на главную"><span class="brand-mark">П</span><span>ПЕРЕВЕЗЁМ<span class="brand-dot">.</span></span></a>
-    <nav class="nav" aria-label="Главная навигация"><a href="#calculator">Рассчитать</a><a href="#van">Автомобиль</a><a href="#max-contact">Почему MAX</a><a href="#steps">Как работаем</a></nav>
+    <nav class="nav" aria-label="Главная навигация"><a href="#calculator">Рассчитать</a><a href="#van">Автомобиль</a><a href="#max-contact">Как заказать</a></nav>
     <a class="phone" href="#calculator"><span class="phone-icon">↗</span> РАССЧИТАТЬ СТОИМОСТЬ</a>
     <button class="menu-toggle" aria-label="Открыть меню">☰</button>
   </header>
@@ -23,17 +24,18 @@
     <section class="hero">
       <div class="hero-copy">
         <div class="eyebrow"><span class="eyebrow-line"></span> ПЕРЕВОЗКА ВЕЩЕЙ ПО РОССИИ</div>
-        <h1>Узнайте цену.<br /><span>Едьте спокойно.</span></h1>
-        <p class="hero-text">Рассчитайте маршрут и базовую стоимость. Детали и точную цену согласуем с вами напрямую в MAX.</p>
+        <h1>Ваши вещи.<br /><span>Наш маршрут.</span></h1>
+        <p class="hero-text">Перевозка по России на Renault Master. Узнайте примерную цену, соберите детали и отправьте заявку в MAX.</p>
         <a class="hero-cta" href="#calculator">Рассчитать поездку <span>↓</span></a>
         <div class="hero-proof"><div class="proof-icon">✳</div><div><b>50 ₽ за километр</b><small>Понятный тариф без сюрпризов</small></div></div>
       </div>
       <div class="hero-art" aria-label="Графитово-серый Renault Master 2020, 3D-визуализация">
-        <div class="art-sun"></div><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
-        <div class="route-label label-a"><i></i> ОТКУДА</div><div class="route-label label-b"><i></i> КУДА</div>
-        <div class="van-platform"><span></span></div>
+        <div class="scene-halo"></div>
+        <svg class="scene-city" viewBox="0 0 900 440" aria-hidden="true"><g fill="currentColor"><path d="M0 380V240h55v-60h45v200h22V150h65v230h25V95h60v285h28V185h70v195h30V140h52v240h25V210h70v170h25V125h65v255h25V190h70v190h20V260h65v120h28V220h60v160Z"/><path d="M150 150v-50h8v50M238 95V45h8v50M588 125V80h8v45"/></g><g stroke="#d1b5ff" stroke-width="3" opacity=".5"><path d="M135 180h35m-35 20h35m-35 20h35M225 125h32m-32 20h32m-32 20h32M310 215h45m-45 20h45M412 170h25m-25 20h25M572 155h40m-40 20h40"/></g></svg>
+        <svg class="scene-trees" viewBox="0 0 900 400" aria-hidden="true"><g fill="currentColor"><path d="m40 160-35 75h22l-35 75h38v65h18v-65h38l-35-75h22Zm740-20-40 85h25l-38 80h45v70h18v-70h45l-38-80h25Zm80 65-28 60h15l-25 60h30v50h16v-50h30l-25-60h15Z"/></g></svg>
+        <div class="scene-road"></div>
         <img class="van-illustration" src="assets/renault-master-2020-3d.png" alt="Графитово-серый Renault Master 2020, цельнометаллический фургон" />
-        <div class="art-caption"><span class="caption-number">01</span><span>Renault Master<br />2020 · графитовый</span><span class="caption-arrow">↗</span></div>
+        <div class="art-caption"><span class="vehicle-status"></span><div><strong>Renault Master</strong><span>2020 · до 2 тонн · графитовый</span></div><b>↗</b></div>
       </div>
       <div class="hero-bottom"><span>ЛЮБОЕ РАССТОЯНИЕ</span><span class="bottom-dash"></span><span>ДО 2 ТОНН</span><span class="bottom-dash"></span><span>ПО ВСЕЙ РОССИИ</span></div>
     </section>
@@ -45,6 +47,7 @@
         <div class="wizard-progress-step" data-progress="2"><span>02</span><b>Груз</b></div><i></i>
         <div class="wizard-progress-step" data-progress="3"><span>03</span><b>Расчёт</b></div>
       </div>
+      <div class="quote-toolbar"><p>Все шаги → одно сообщение в MAX</p><div><button type="button" id="copyQuote" class="copy-button">⧉ Скопировать всю заявку</button><span id="copyStatus" role="status" aria-live="polite"></span></div></div>
       <div class="configurator wizard-layout">
         <div class="route-panel wizard-main">
           <section class="wizard-page active" data-page="1" aria-labelledby="step1Title">
@@ -62,7 +65,7 @@
           </section>
 
           <section class="wizard-page" data-page="2" aria-labelledby="step2Title" hidden>
-            <div class="wizard-page-heading"><span>ШАГ 2 ИЗ 3</span><h3 id="step2Title">Расскажите о перевозке</h3><p>Дополнительные условия повлияют на точный расчёт, их согласуем в MAX.</p></div>
+            <div class="wizard-page-heading"><span>ШАГ 2 ИЗ 3</span><h3 id="step2Title">Детали для сообщения в MAX</h3><p>Заполните, что знаете. Эти данные попадут в общий текст заявки — повторять их в чате не придётся.</p></div>
             <div class="cargo-fields">
               <label class="detail-field detail-wide">Что перевозим?<input type="text" data-trip-detail="cargo" placeholder="Например, мебель и коробки" maxlength="100" /></label>
               <div class="detail-grid">
@@ -89,7 +92,7 @@
             <div class="wizard-page-heading"><span>ШАГ 3 ИЗ 3</span><h3 id="step3Title">Ваша примерная стоимость</h3><p>Расчёт по дорожному маршруту. Без оплаты и автоматического бронирования.</p></div>
             <div class="final-route"><span id="finalRouteFrom">Москва</span><span class="final-route-arrow">→</span><span id="finalRouteTo">Казань</span></div>
             <div class="final-price-card"><span>БАЗОВАЯ ОЦЕНКА</span><strong id="finalPrice">— ₽</strong><small><span id="finalDistance">— км</span> × 50 ₽/км</small></div>
-            <div class="final-details" id="finalDetails"></div>
+            <div class="final-details" id="finalDetails"></div><label class="message-label" for="messagePreview">Готовый текст для MAX</label><textarea id="messagePreview" class="message-preview" readonly rows="10"></textarea>
             <p class="final-disclaimer">Это предварительная оценка только за маршрут. Стоимость грузчиков, подъёма и другие условия подтвердим в MAX. Поездка не считается заказанной, пока вы лично не согласуете её с владельцем.</p>
             <a id="maxCta" class="max-cta" href="https://max.ru/:share?text=Здравствуйте%21%20Хочу%20уточнить%20расчёт%20перевозки." target="_blank" rel="noreferrer">Написать в MAX для точного расчёта <span>↗</span></a>
             <p class="max-hint">Откроется MAX с готовым текстом. Вы сможете проверить его, выбрать чат и отправить.</p>
@@ -105,52 +108,17 @@
           <div class="estimate-price-label">БАЗОВАЯ ОЦЕНКА</div>
           <div class="estimate-price" id="priceValue">— <span>₽</span></div>
           <div class="estimate-disclaimer">Дополнительные услуги и точную цену согласуем напрямую в MAX. Сайт не принимает оплату и не бронирует автомобиль.</div>
-          <div class="estimate-mini-details" id="estimateDetails">Маршрут ещё не рассчитан</div>
+          <div class="estimate-mini-details" id="estimateDetails">Маршрут ещё не рассчитан</div><div class="summary-note"><b>Всё в одном сообщении</b><p>Маршрут, груз, этажи и дата автоматически собираются в заявку. Скопируйте её кнопкой над формой и вставьте в чат MAX.</p></div>
           <div class="estimate-badges"><span>✓ До 2 т</span><span>✓ По России</span></div>
         </aside>
       </div>
     </section>
 
-    <section class="max-reasons" id="max-contact">
-      <div class="eyebrow"><span class="eyebrow-line"></span> НАПРЯМУЮ И ПО-ДЕЛОВОМУ</div>
-      <h2>Почему согласуем в MAX?</h2>
-      <div class="max-reasons-grid">
-        <article><span>01</span><h3>Живое общение</h3><p>Можно сразу уточнить адрес, объём и особенности груза.</p></article>
-        <article><span>02</span><h3>Гибкое время</h3><p>Согласуем удобную дату и время подачи напрямую.</p></article>
-        <article><span>03</span><h3>Без комиссии сайта</h3><p>На сайте только ориентир. Итоговые условия подтверждаем в переписке.</p></article>
-      </div>
+    <section class="vehicle-section" id="van">
+      <div class="vehicle-image"><span class="eyebrow">ВАШ АВТОМОБИЛЬ</span><img src="assets/renault-master-2020-3d.png" alt="Графитовый Renault Master 2020" loading="lazy" /></div>
+      <div class="vehicle-info"><div class="eyebrow">ОДИН ФУРГОН ДЛЯ ВАШИХ ЗАДАЧ</div><h2>Переезд, мебель<br />или важный груз.</h2><p>Цельнометаллический Renault Master 2020. По городу и между городами — на любое расстояние.</p><div class="vehicle-specs"><div><b>2 т</b><span>до · грузоподъёмность</span></div><div><b>3,7 × 2,2 × 1,7 м</b><span>длина × высота × ширина кузова</span></div></div></div>
     </section>
-
-    <section class="drive-section" id="drive" aria-labelledby="drive-title">
-      <div class="drive-stage">
-        <div class="drive-copy">
-          <div class="eyebrow"><span class="eyebrow-line"></span> МАРШРУТ В ДВИЖЕНИИ</div>
-          <h2 id="drive-title">Один фургон.<br /><span>Весь путь — с вами.</span></h2>
-          <p>Прокручивайте страницу — Renault Master проедет по маршруту. В кузове поместятся вещи для переезда, мебель и техника.</p>
-          <div class="drive-facts"><span>ГРАФИТОВЫЙ RENAULT MASTER</span><i></i><span>ДО 2 ТОНН</span></div>
-        </div>
-        <div class="drive-scene" aria-hidden="true">
-          <svg class="drive-track" viewBox="0 0 1200 340" preserveAspectRatio="none">
-            <path class="drive-track-shadow" d="M 1260 250 C 1000 80 820 310 620 180 S 250 70 -60 230" />
-            <path class="drive-track-line" d="M 1260 250 C 1000 80 820 310 620 180 S 250 70 -60 230" />
-          </svg>
-          <div class="drive-pin drive-pin-start"><span>МАРШРУТ</span><b>ОТКУДА</b></div>
-          <div class="drive-pin drive-pin-end"><span>ТОЧКА</span><b>КУДА</b></div>
-          <div class="drive-car" id="driveCar"><img src="assets/renault-master-2020-3d.png" alt="" /></div>
-          <div class="drive-ground"></div>
-        </div>
-        <div class="drive-footer"><span>ДВИГАЙТЕСЬ ВНИЗ, ЧТОБЫ ПРОДОЛЖИТЬ МАРШРУТ</span><span class="drive-progress"><i id="driveProgress"></i></span><span>01 — 02</span></div>
-      </div>
-    </section>
-
-    <section class="van-section" id="van">
-      <div class="van-photo-side"><div class="van-photo-frame"><div class="photo-tag">НАШ АВТОМОБИЛЬ <span>01 / 01</span></div><div class="van-photo-art"><div class="photo-sun"></div><img class="van-photo-3d" src="assets/renault-master-2020-3d.png" alt="3D-визуализация графитово-серого Renault Master 2020" /><div class="photo-ground"></div></div></div></div>
-      <div class="van-copy"><div class="eyebrow"><span class="eyebrow-line"></span> ПРОСТРАНСТВО ДЛЯ ВАЖНОГО</div><h2 id="van-title">Всё поместится.<br /><span>И доедет.</span></h2><p>Цельнометаллический фургон Renault Master 2020 года — для переезда, мебели, техники и коммерческих грузов.</p><div class="spec-grid"><div class="spec"><b>до 2<span> т</span></b><small>грузоподъёмность</small></div><div class="spec"><b>3,7<span> м</span></b><small>длина кузова</small></div><div class="spec"><b>2,2<span> м</span></b><small>высота кузова</small></div><div class="spec"><b>1,7<span> м</span></b><small>ширина кузова</small></div></div><div class="van-note"><span>↳</span> Любое расстояние — от соседнего района до другого края России</div></div>
-    </section>
-
-    <section class="steps-section" id="steps"><div class="steps-head"><div class="eyebrow"><span class="eyebrow-line"></span> ЧЕТЫРЕ ШАГА</div><h2>От оценки<br />до поездки.</h2><p>Без оплаты на сайте.<br />Вы сами решаете, продолжать ли в MAX.</p></div><div class="steps-grid"><div class="step"><span class="step-index">01</span><div class="step-icon">⌖</div><h3>Укажите маршрут</h3><p>Построим путь по дорогам и покажем базовую стоимость.</p></div><div class="step"><span class="step-index">02</span><div class="step-icon">▤</div><h3>Добавьте детали</h3><p>Укажите груз, этажи, лифты, грузчиков и дату.</p></div><div class="step"><span class="step-index">03</span><div class="step-icon">↗</div><h3>Напишите в MAX</h3><p>Откроем готовое сообщение с маршрутом и оценкой.</p></div><div class="step"><span class="step-index">04</span><div class="step-icon">✓</div><h3>Согласуйте поездку</h3><p>Уточните итоговую цену и подтвердите удобное время лично.</p></div></div></section>
-
-    <section class="closing"><div><div class="eyebrow"><span class="eyebrow-line"></span> ПОРА В ДОРОГУ</div><h2>Вещи готовы.<br />Маршрут тоже.</h2></div><a href="#calculator" class="closing-link">Рассчитать поездку <span>↗</span></a><div class="closing-mark">П.</div></section>
+    <section class="handoff-section" id="max-contact"><div class="handoff-head"><div class="eyebrow">ОТ РАСЧЁТА К ПОЕЗДКЕ</div><h2>Договоримся<br /><span>в MAX.</span></h2><a class="hero-cta" href="#calculator">Собрать заявку <span>↗</span></a></div><div class="handoff-grid" id="steps"><article><span>01 / МАРШРУТ</span><h3>Узнайте ориентир</h3><p>Выберите адреса. Покажем дорожный маршрут и цену по 50 ₽ за километр.</p></article><article><span>02 / ДЕТАЛИ</span><h3>Скопируйте всю заявку</h3><p>На втором шаге укажите груз, этажи, лифты и дату. Одна кнопка соберёт данные со всех шагов.</p></article><article><span>03 / ЛИЧНЫЙ ЧАТ</span><h3>Уточните и согласуйте</h3><p>Вставьте заявку в MAX, приложите фото вещей и согласуйте цену и время подачи напрямую.</p></article></div></section>
   </main>
   <footer><a class="brand footer-brand" href="#top"><span class="brand-mark">П</span><span>ПЕРЕВЕЗЁМ<span class="brand-dot">.</span></span></a><span>Перевозка вещей по России · Renault Master 2020</span><a href="#calculator">Рассчитать маршрут</a><span class="copyright">© 2026</span></footer>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
