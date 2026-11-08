@@ -7,8 +7,8 @@
   <meta name="description" content="Рассчитайте базовую стоимость перевозки вещей по России на Renault Master 2020. Точную цену и дату согласуйте напрямую в MAX." />
   <title>Перевезём — перевозка вещей по России</title>
   <link rel="preconnect" href="https://unpkg.com" />
-  <link rel="preconnect" href="https://a.tile.openstreetmap.fr" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.css" />
   <link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="redesign.css" />
 </head>
 <body>
@@ -61,7 +61,7 @@
             </div>
             <div class="map-tools"><span class="map-hint"><span class="hint-pulse"></span>На карте: сначала погрузка, затем доставка. База неподвижна.</span><button id="locateMe" class="locate-button" type="button">◎ Моя геопозиция</button></div>
             <div class="map-frame"><div id="map" role="application" aria-label="Карта для выбора автомобильного маршрута"></div><div class="map-legend"><span><i class="legend-dot from-dot"></i>Отправление</span><span><i class="legend-dot to-dot"></i>Доставка</span></div><div class="map-loading" id="mapLoading"><span></span> Загружаем карту…</div></div>
-            <div class="map-footnote"><span id="mapProvider" role="status">Карта: OpenStreetMap · стиль HOT</span> · <span id="routeStatus" role="status">Прокладываем автомобильный маршрут…</span> · © OpenStreetMap, <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noreferrer">данные маршрутов</a> · границы Natural Earth · маршрутизация <a href="https://routing.openstreetmap.de/about.html" target="_blank" rel="noreferrer">FOSSGIS</a></div>
+            <div class="map-footnote"><span id="mapProvider" role="status">Карта: OpenFreeMap · Liberty</span> · <span id="routeStatus" role="status">Прокладываем автомобильный маршрут…</span> · © OpenStreetMap, <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noreferrer">данные маршрутов</a> · границы Natural Earth · маршрутизация <a href="https://routing.openstreetmap.de/about.html" target="_blank" rel="noreferrer">FOSSGIS</a></div>
             <div class="wizard-actions wizard-actions-end"><button type="button" id="nextFromRoute" class="wizard-button primary" disabled>Указать детали груза <span>→</span></button></div>
           </section>
 
@@ -124,9 +124,11 @@
     <section class="handoff-section" id="max-contact"><div class="handoff-head"><div class="eyebrow">ОТ РАСЧЁТА К ПОЕЗДКЕ</div><h2>Договоримся<br /><span>в MAX.</span></h2><a class="hero-cta" href="#calculator">Собрать заявку <span>↗</span></a></div><div class="handoff-grid" id="steps"><article><span>01 / МАРШРУТ</span><h3>Узнайте ориентир</h3><p>Выберите адреса. Покажем дорожный маршрут и цену по 50 ₽ за километр.</p></article><article><span>02 / ДЕТАЛИ</span><h3>Скопируйте всю заявку</h3><p>На втором шаге укажите груз, этажи, лифты и дату. Одна кнопка соберёт данные со всех шагов.</p></article><article><span>03 / ЛИЧНЫЙ ЧАТ</span><h3>Уточните и согласуйте</h3><p>Вставьте заявку в MAX, приложите фото вещей и согласуйте цену и время подачи напрямую.</p></article></div></section>
   </main>
   <footer><a class="brand footer-brand" href="#top"><span class="brand-mark">П</span><span>ПЕРЕВЕЗЁМ<span class="brand-dot">.</span></span></a><span>Перевозка вещей по России · Renault Master 2020</span><a href="#calculator">Рассчитать маршрут</a><span class="copyright">© 2026</span></footer>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="map-tiles.js"></script>
-  <script src="app.js"></script>
+  <script type="importmap">
+    {"imports":{"leaflet":"https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js","maplibre-gl":"https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.mjs"}}
+  </script>
+  <script type="module" src="map-setup.js"></script>
 </body>
 </html>
 

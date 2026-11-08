@@ -12,6 +12,6 @@ Routing starts at the fixed depot: улица Пески Набережные, 1
 
 ## Map basemap
 
-`map-tiles.js` mounts the Humanitarian OpenStreetMap Team (HOT) raster style in Leaflet without an API key. If that tile server fails, the map switches once to the standard OpenStreetMap raster layer and keeps the route, markers and click selection. Both styles use OpenStreetMap data; the change is the tile source and cartographic style, not a new address-search or routing provider. Search and road routing continue to use Photon/Nominatim/FOSSGIS.
+`map-setup.js` loads Leaflet with the MapLibre GL Leaflet adapter, and `map-tiles.js` mounts the OpenFreeMap Liberty vector style without an API key. The adapter reads style attribution into Leaflet's attribution control. On repeated GL resource failures, the map switches once to standard OpenStreetMap raster tiles and keeps the route, markers and click selection. Search and road routing continue to use Photon/Nominatim/FOSSGIS.
 
-HOT tile source: https://www.openstreetmap.fr/usage/ . Standard OSM attribution and tile policy: https://operations.osmfoundation.org/policies/tiles/ .
+OpenFreeMap supports commercial use, serves the Liberty style for free without an API key, and requires attribution to OpenMapTiles and OpenStreetMap: https://openfreemap.org/ and https://openfreemap.org/quick_start/ .

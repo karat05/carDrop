@@ -4,11 +4,10 @@
   else root.CardropMapTiles = api;
 })(typeof window !== 'undefined' ? window : globalThis, function () {
   'use strict';
-  const hotAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> · стиль <a href="https://www.hotosm.org/" target="_blank" rel="noopener noreferrer">HOT</a>';
+  const libertyStyle = 'https://tiles.openfreemap.org/styles/liberty';
   const osmAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>';
 
   function mount(L, map, _config = {}, onChange = function () {}) {
-    const container = map.getContainer();
     let activeLayer, switchedToFallback = false;
     const common = { tileSize: 256, updateWhenIdle: true, updateWhenZooming: false, keepBuffer: 1 };
 
@@ -22,13 +21,17 @@
       onChange({ provider: 'osm', reason: 'fallback' });
     }
 
-    activeLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-      ...common, subdomains: 'abc', maxZoom: 19, attribution: hotAttribution
-    });
-    // If the alternate tile service is unavailable, preserve map functionality.
-    activeLayer.on('tileerror', useOsmFallback);
-    activeLayer.addTo(map);
-    onChange({ provider: 'hot', reason: 'configured' });
+    try {
+      activeLayer = window.CardropMapLibreGL({ style: libertyStyle }).addTo(map);
+      const glMap = activeLayer.getMaplibreMap();
+      let resourceErrors = 0;
+      glMap.on('error', event => {
+        if (event.error && ++resourceErrors >= 4) useOsmFallback();
+      });
+      onChange({ provider: 'liberty', reason: 'configured' });
+    } catch {
+      useOsmFallback();
+    }
     return { getLayer: () => activeLayer };
   }
   return { mount };
