@@ -10,8 +10,8 @@ Four compact content areas: hero, three-step calculator, vehicle specifications,
 
 Routing starts at the fixed depot: улица Пески Набережные, 1, Александров (56.3992489, 38.7328341; OpenStreetMap building way/169667848, confirmed by Nominatim and Photon). OSRM receives depot → pickup → delivery; both leg distances contribute to the total at 50 RUB/km. Return to depot is excluded. Reverse swaps pickup/delivery, preserves depot and requests a fresh road route; it does not reverse the geometry array or append a return leg.
 
-## Yandex basemap
+## Map basemap
 
-`map-tiles.js` mounts Yandex Tiles API under Leaflet when `map-config.js` contains a browser key with Tiles API access. The key is intentionally public and must be restricted to production HTTP Referer in Yandex Console; never put an account password or server signing secret here. Set `projection=web_mercator` to align with Leaflet EPSG:3857, `maptype=driving`, `lang=ru_RU`, `scale=1` and a 256px tile grid. Search and routing continue to use OSM/Photon/Nominatim/FOSSGIS, including attribution. A missing key or tile load error switches once to OSM, removes the Yandex logo/attribution and preserves route and markers. No fallback call to an undocumented/keyless Yandex endpoint is made.
+`map-tiles.js` mounts the Humanitarian OpenStreetMap Team (HOT) raster style in Leaflet without an API key. If that tile server fails, the map switches once to the standard OpenStreetMap raster layer and keeps the route, markers and click selection. Both styles use OpenStreetMap data; the change is the tile source and cartographic style, not a new address-search or routing provider. Search and road routing continue to use Photon/Nominatim/FOSSGIS.
 
-Sources checked 2026-11-08: https://yandex.ru/maps-api/docs/tiles-api/request.html and https://yandex.ru/maps-api/docs/tiles-api/index.html . `assets/yandex-logo.svg` is the unmodified Russian logo from the official download linked in that documentation. It is placed at the original 88×48 size in the top-left map corner and links to Yandex Maps. Yandex can take up to 15 minutes to activate a new key. A `403 Invalid api key` requires checking activation and Tiles API product access in Console.
+HOT tile source: https://www.openstreetmap.fr/usage/ . Standard OSM attribution and tile policy: https://operations.osmfoundation.org/policies/tiles/ .
