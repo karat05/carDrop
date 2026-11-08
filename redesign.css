@@ -55,3 +55,8 @@ html,body{overflow-x:clip}body{width:100%}.hero-art,.ambient-bg{contain:paint;ov
 .contact-option-icon-wa svg{display:block;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:760px){.route-legs{grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);gap:6px;margin:14px 0 18px}.route-leg{gap:8px;padding:10px 8px}.route-leg-index{width:28px;height:28px;flex-basis:28px;border-radius:9px;font-size:11px}.route-leg small{font-size:12px}.route-leg b{font-size:17px}.route-return-note{font-size:12px}.final-price-card>span{font-size:12px}.final-details{font-size:14px}.message-label{font-size:14px}.message-preview{font-size:14px;min-height:250px}.final-disclaimer{font-size:13px}.vehicle-specs b{font-size:23px}.vehicle-specs span{font-size:13px}}
 @media(max-width:380px){.route-legs{grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr);gap:4px}.route-leg{gap:6px;padding:9px 6px}.route-leg small{font-size:11px}.route-leg b{font-size:15px}}
+.hero .hero-proof{gap:15px;margin-top:28px}
+.hero .proof-icon{width:46px;height:46px;flex:0 0 46px;font-size:22px}
+.hero .hero-proof b{font-size:21px;line-height:1.3}
+.hero .hero-proof small{font-size:14px;line-height:1.45;margin-top:3px}
+@media(max-width:760px){.hero .hero-proof{gap:12px;margin-top:24px}.hero .proof-icon{width:42px;height:42px;flex-basis:42px;font-size:20px}.hero .hero-proof b{font-size:18px}.hero .hero-proof small{font-size:13px}}
