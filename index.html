@@ -51,14 +51,15 @@
       <div class="configurator wizard-layout">
         <div class="route-panel wizard-main">
           <section class="wizard-page active" data-page="1" aria-labelledby="step1Title">
-            <div class="wizard-page-heading"><span>ШАГ 1 ИЗ 3</span><h3 id="step1Title">Откуда и куда везём?</h3><p>Укажите адреса с домом или выберите точки на карте.</p></div>
+            <div class="wizard-page-heading"><span>ШАГ 1 ИЗ 3</span><h3 id="step1Title">Где забрать и куда доставить?</h3><p>Выезд с базы → погрузка → доставка. Укажите два адреса или выберите их на карте.</p></div>
+            <div class="depot-card"><span class="depot-lock">▣ БАЗА · ЗАКРЕПЛЕНА</span><strong>улица Пески Набережные, 1, Александров</strong><small>Начало каждого маршрута. Эту точку нельзя изменить или передвинуть.</small></div>
             <div class="route-inputs">
               <div class="route-rail"><span class="rail-start"></span><span class="rail-line"></span><span class="rail-end"></span></div>
-              <label class="field"><span>ОТКУДА</span><div class="input-wrap"><input id="fromInput" value="Москва" autocomplete="off" placeholder="Город, улица, дом" /><button class="clear-input" type="button" aria-label="Очистить адрес отправления">×</button></div><div class="suggestions" id="fromSuggest"></div></label>
-              <button class="swap-button" id="swapRoute" type="button" aria-label="Поменять адреса местами">↕</button>
-              <label class="field"><span>КУДА</span><div class="input-wrap"><input id="toInput" value="Казань" autocomplete="off" placeholder="Город, улица, дом" /><button class="clear-input" type="button" aria-label="Очистить адрес доставки">×</button></div><div class="suggestions" id="toSuggest"></div></label>
+              <label class="field"><span>1 · ГДЕ ЗАБРАТЬ ГРУЗ</span><div class="input-wrap"><input id="fromInput" value="Москва" autocomplete="off" placeholder="Город, улица, дом" /><button class="clear-input" type="button" aria-label="Очистить адрес погрузки">×</button></div><div class="suggestions" id="fromSuggest"></div></label>
+              <button class="swap-button" id="swapRoute" type="button" aria-label="Обратный маршрут: поменять погрузку и доставку">⇄ Обратный маршрут</button>
+              <label class="field"><span>2 · КУДА ДОСТАВИТЬ</span><div class="input-wrap"><input id="toInput" value="Казань" autocomplete="off" placeholder="Город, улица, дом" /><button class="clear-input" type="button" aria-label="Очистить адрес доставки">×</button></div><div class="suggestions" id="toSuggest"></div></label>
             </div>
-            <div class="map-tools"><span class="map-hint"><span class="hint-pulse"></span>Ищите улицу и дом или поставьте точки на карте</span><button id="locateMe" class="locate-button" type="button">◎ Моя геопозиция</button></div>
+            <div class="map-tools"><span class="map-hint"><span class="hint-pulse"></span>На карте: сначала погрузка, затем доставка. База неподвижна.</span><button id="locateMe" class="locate-button" type="button">◎ Моя геопозиция</button></div>
             <div class="map-frame"><div id="map" role="application" aria-label="Карта для выбора автомобильного маршрута"></div><div class="map-legend"><span><i class="legend-dot from-dot"></i>Отправление</span><span><i class="legend-dot to-dot"></i>Доставка</span></div><div class="map-loading" id="mapLoading"><span></span> Загружаем карту…</div></div>
             <div class="map-footnote"><span id="routeStatus" role="status">Прокладываем автомобильный маршрут…</span> · © OpenStreetMap, <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noreferrer">исправить карту</a> · границы Natural Earth · маршрутизация <a href="https://routing.openstreetmap.de/about.html" target="_blank" rel="noreferrer">FOSSGIS</a></div>
             <div class="wizard-actions wizard-actions-end"><button type="button" id="nextFromRoute" class="wizard-button primary" disabled>Указать детали груза <span>→</span></button></div>
@@ -90,7 +91,8 @@
 
           <section class="wizard-page" data-page="3" aria-labelledby="step3Title" hidden>
             <div class="wizard-page-heading"><span>ШАГ 3 ИЗ 3</span><h3 id="step3Title">Ваша примерная стоимость</h3><p>Расчёт по дорожному маршруту. Без оплаты и автоматического бронирования.</p></div>
-            <div class="final-route"><span id="finalRouteFrom">Москва</span><span class="final-route-arrow">→</span><span id="finalRouteTo">Казань</span></div>
+            <div class="final-depot">Старт: улица Пески Набережные, 1, Александров</div><div class="final-route"><span id="finalRouteFrom">Москва</span><span class="final-route-arrow">→</span><span id="finalRouteTo">Казань</span></div>
+            <div class="leg-summary"><span>База → погрузка <b data-route-leg="pickup">— км</b></span><span>Погрузка → доставка <b data-route-leg="delivery">— км</b></span><small>Возвращение на базу в расчёт не включено.</small></div>
             <div class="final-price-card"><span>БАЗОВАЯ ОЦЕНКА</span><strong id="finalPrice">— ₽</strong><small><span id="finalDistance">— км</span> × 50 ₽/км</small></div>
             <div class="final-details" id="finalDetails"></div><label class="message-label" for="messagePreview">Готовый текст для MAX</label><textarea id="messagePreview" class="message-preview" readonly rows="10"></textarea>
             <p class="final-disclaimer">Это предварительная оценка только за маршрут. Стоимость грузчиков, подъёма и другие условия подтвердим в MAX. Поездка не считается заказанной, пока вы лично не согласуете её с владельцем.</p>
@@ -101,9 +103,10 @@
         </div>
         <aside class="estimate-card" id="estimateCard">
           <div class="estimate-top"><span>ВАШ РАСЧЁТ</span><span class="live-dot"></span></div>
-          <div class="estimate-route"><div id="estimateFrom">Москва</div><span>↓</span><div id="estimateTo">Казань</div></div>
+          <div class="estimate-depot"><small>ВЫЕЗД С БАЗЫ</small><b>Александров, Пески Набережные, 1</b></div><div class="estimate-route"><div id="estimateFrom">Москва</div><span>↓</span><div id="estimateTo">Казань</div></div>
+          <div class="leg-summary"><span>До погрузки <b data-route-leg="pickup">— км</b></span><span>С грузом <b data-route-leg="delivery">— км</b></span><small>Возвращение на базу не включено.</small></div>
           <div class="estimate-separator"></div>
-          <div class="estimate-distance"><span>Дорога</span><b id="distanceValue">— км</b></div>
+          <div class="estimate-distance"><span>Всего по дорогам</span><b id="distanceValue">— км</b></div>
           <div class="estimate-distance"><span>Базовый тариф</span><b>50 ₽ <small>/ км</small></b></div>
           <div class="estimate-price-label">БАЗОВАЯ ОЦЕНКА</div>
           <div class="estimate-price" id="priceValue">— <span>₽</span></div>

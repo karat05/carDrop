@@ -1,6 +1,8 @@
 (() => {
   const rate = 50;
   const maxShareUrl = 'https://max.ru/:share';
+  // OpenStreetMap building way/169667848: exact address confirmed at setup.
+  const depot = Object.freeze({ name: 'улица Пески Набережные, 1, Александров', lat: 56.3992489, lon: 38.7328341 });
   const inputs = { from: document.querySelector('#fromInput'), to: document.querySelector('#toInput') };
   const suggestions = { from: document.querySelector('#fromSuggest'), to: document.querySelector('#toSuggest') };
   const points = {
@@ -14,7 +16,7 @@
   const pages = [...document.querySelectorAll('.wizard-page')];
   const routeStatus = document.querySelector('#routeStatus');
   const nextRouteButton = document.querySelector('#nextFromRoute');
-  let map, markers = {}, routeLine, routeDistanceMeters = null;
+  let map, markers = {}, routeLine, routeDistanceMeters = null, routeLegs = null;
   let clickNext = 'from', searchTimers = {}, routeToken = 0, lastRouteRequestAt = 0, lastNominatimRequestAt = 0;
   let currentStep = 1;
 
@@ -90,8 +92,9 @@
     const date = d.date ? new Intl.DateTimeFormat('ru-RU').format(new Date(`${d.date}T12:00:00`)) : 'согласуем';
     return [
       'ЗАЯВКА НА ПЕРЕВОЗКУ', '',
-      '📍 МАРШРУТ', `Откуда: ${inputs.from.value.trim() || 'не указано'}`, `Куда: ${inputs.to.value.trim() || 'не указано'}`,
-      `По дорогам: ${km}`, '',
+      '📍 МАРШРУТ', `Старт с базы: ${depot.name}`, `Погрузка: ${inputs.from.value.trim() || 'не указано'}`, `Доставка: ${inputs.to.value.trim() || 'не указано'}`,
+      ...(routeLegs ? [`База → погрузка: ${formatKm(routeLegs[0] / 1000)} км`, `Погрузка → доставка: ${formatKm(routeLegs[1] / 1000)} км`] : []),
+      `Всего по дорогам: ${km}`, 'Возвращение на базу не включено.', '',
       '📦 ГРУЗ И ПОГРУЗКА',
       `Что перевозим: ${d.cargo || 'уточню в чате'}`,
       `Вес: ${d.weight ? `${d.weight} кг` : 'не указан'} · Объём: ${d.volume ? `${d.volume} м³` : 'не указан'}`,
@@ -107,6 +110,8 @@
   function renderEstimate() {
     document.querySelector('#estimateFrom').textContent = points.from.name || 'Точка отправления';
     document.querySelector('#estimateTo').textContent = points.to.name || 'Точка доставки';
+    document.querySelectorAll('[data-route-leg="pickup"]').forEach(el => el.textContent = routeLegs ? `${formatKm(routeLegs[0] / 1000)} км` : '— км');
+    document.querySelectorAll('[data-route-leg="delivery"]').forEach(el => el.textContent = routeLegs ? `${formatKm(routeLegs[1] / 1000)} км` : '— км');
     const estimateDetails = detailsLines();
     document.querySelector('#estimateDetails').textContent = estimateDetails.length > 1 ? estimateDetails.slice(0, 4).join(' · ') : 'Укажите условия груза на следующем шаге';
     document.querySelector('#messagePreview').value = createMaxMessage();
@@ -163,9 +168,14 @@
   async function requestRoadRoute() {
     const token = ++routeToken;
     routeDistanceMeters = null;
+    routeLegs = null;
     if (routeLine && map) { map.removeLayer(routeLine); routeLine = null; }
     renderEstimate();
     if (!map || !points.from || !points.to) return;
+    if (inputs.from.value.trim() !== points.from.name || inputs.to.value.trim() !== points.to.name) {
+      setRouteStatus('Выберите адрес погрузки и доставки из подсказок или на карте.');
+      return;
+    }
     if (samePoint(points.from, points.to)) {
       setRouteStatus('Выберите разные точки отправления и доставки.', 'error');
       return;
@@ -176,7 +186,7 @@
     if (waitMs) await new Promise(resolve => setTimeout(resolve, waitMs));
     if (token !== routeToken) return;
 
-    const coords = `${points.from.lon},${points.from.lat};${points.to.lon},${points.to.lat}`;
+    const coords = [depot, points.from, points.to].map(point => `${point.lon},${point.lat}`).join(';');
     const url = `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coords}?overview=full&geometries=geojson&alternatives=false&steps=false`;
     lastRouteRequestAt = Date.now();
     try {
@@ -185,12 +195,13 @@
       const result = await response.json();
       if (token !== routeToken) return;
       const route = result.code === 'Ok' && result.routes?.[0];
-      if (!route || !Number.isFinite(route.distance) || !route.geometry?.coordinates?.length) throw new Error('route not found');
+      if (!route || !Number.isFinite(route.distance) || !route.geometry?.coordinates?.length || route.legs?.length !== 2 || !route.legs.every(leg => Number.isFinite(leg.distance))) throw new Error('route not found');
 
       routeDistanceMeters = route.distance;
+      routeLegs = route.legs.map(leg => leg.distance);
       const latlngs = route.geometry.coordinates.map(([lon, lat]) => [lat, lon]);
       routeLine = L.polyline(latlngs, { color: '#648496', weight: 5, opacity: .98, smoothFactor: 0, lineCap: 'round', lineJoin: 'round' }).addTo(map);
-      for (const [key, waypoint] of [['from', result.waypoints?.[0]], ['to', result.waypoints?.[1]]]) {
+      for (const [key, waypoint] of [['from', result.waypoints?.[1]], ['to', result.waypoints?.[2]]]) {
         const snapped = waypoint?.location;
         if (snapped && markers[key]) markers[key].setLatLng([snapped[1], snapped[0]]);
       }
@@ -199,6 +210,7 @@
     } catch {
       if (token !== routeToken) return;
       routeDistanceMeters = null;
+      routeLegs = null;
       renderEstimate();
       setRouteStatus('Не удалось построить маршрут по дорогам. Уточните адреса или выберите точки на карте.', 'error');
     }
@@ -212,7 +224,7 @@
     if (!map) return renderEstimate();
     if (markers[key]) markers[key].setLatLng([point.lat, point.lon]);
     else markers[key] = L.marker([point.lat, point.lon], { icon: iconFor(key), keyboard: true, title: key === 'from' ? 'Точка отправления' : 'Точка доставки' }).addTo(map);
-    if (markers.from && markers.to && center) map.fitBounds(L.latLngBounds([[points.from.lat, points.from.lon], [points.to.lat, points.to.lon]]).pad(.55), { maxZoom: 7, animate: true });
+    if (markers.from && markers.to && center) map.fitBounds(L.latLngBounds([depot, points.from, points.to].map(point => [point.lat, point.lon])).pad(.2), { maxZoom: 12, animate: true });
     else if (center) map.setView([point.lat, point.lon], 7);
     if (coordinatesChanged && markers.from && markers.to) requestRoadRoute();
     renderEstimate();
@@ -259,7 +271,8 @@
 
   async function resolveInput(key) {
     const query = inputs[key].value.trim();
-    if (!query || query === points[key].name) return true;
+    if (!query) { showSuggestions(key, []); return false; }
+    if (query === points[key].name) { if (routeDistanceMeters === null) await requestRoadRoute(); return true; }
     suggestions[key].replaceChildren();
     const loading = document.createElement('div'); loading.className = 'suggestion'; loading.textContent = 'Ищем адрес…';
     suggestions[key].append(loading); suggestions[key].classList.add('open');
@@ -316,6 +329,10 @@
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>'
     }).addTo(map);
     L.control.zoom({ position: 'topright' }).addTo(map);
+    L.marker([depot.lat, depot.lon], {
+      draggable: false, keyboard: true, title: `База (закреплена): ${depot.name}`,
+      icon: L.divIcon({className: '', html: '<span class="depot-marker" aria-hidden="true">Б</span>', iconSize: [28,28], iconAnchor: [14,14]})
+    }).addTo(map).bindPopup(`База · закреплена<br>${depot.name}`);
     highlightRussia();
     map.on('click', event => {
       const key = clickNext;
@@ -357,6 +374,10 @@
 
   for (const key of ['from', 'to']) {
     inputs[key].addEventListener('input', () => {
+      routeToken++;
+      routeDistanceMeters = null; routeLegs = null;
+      if (routeLine && map) { map.removeLayer(routeLine); routeLine = null; }
+      renderEstimate();
       clearTimeout(searchTimers[key]);
       const query = inputs[key].value.trim();
       if (query.length < 2) { suggestions[key].classList.remove('open'); return; }
@@ -371,7 +392,7 @@
     });
     inputs[key].addEventListener('blur', () => setTimeout(() => suggestions[key].classList.remove('open'), 180));
     inputs[key].closest('.field').querySelector('.clear-input').addEventListener('click', () => {
-      inputs[key].value = ''; inputs[key].focus(); suggestions[key].classList.remove('open');
+      inputs[key].value = ''; inputs[key].dispatchEvent(new Event('input')); inputs[key].focus(); suggestions[key].classList.remove('open');
     });
   }
 
