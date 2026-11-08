@@ -324,10 +324,11 @@
       return;
     }
     map = L.map('map', { zoomControl: false, scrollWheelZoom: true, wheelPxPerZoomLevel: 100 }).setView([61.5, 93], 3);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>'
-    }).addTo(map);
+    window.CardropMapTiles.mount(L, map, window.CARDROP_MAP_CONFIG, state => {
+      document.querySelector('#mapProvider').textContent = state.provider === 'yandex'
+        ? 'Карта: Яндекс' : state.reason === 'tile-error'
+          ? 'Карта: OpenStreetMap · резервная подложка' : 'Карта: OpenStreetMap';
+    });
     L.control.zoom({ position: 'topright' }).addTo(map);
     L.marker([depot.lat, depot.lon], {
       draggable: false, keyboard: true, title: `База (закреплена): ${depot.name}`,

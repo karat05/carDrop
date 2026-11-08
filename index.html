@@ -8,6 +8,7 @@
   <title>Перевезём — перевозка вещей по России</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="preconnect" href="https://tile.openstreetmap.org" />
+  <link rel="preconnect" href="https://tiles.api-maps.yandex.ru" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="styles.css" /><link rel="stylesheet" href="redesign.css" />
 </head>
@@ -61,7 +62,7 @@
             </div>
             <div class="map-tools"><span class="map-hint"><span class="hint-pulse"></span>На карте: сначала погрузка, затем доставка. База неподвижна.</span><button id="locateMe" class="locate-button" type="button">◎ Моя геопозиция</button></div>
             <div class="map-frame"><div id="map" role="application" aria-label="Карта для выбора автомобильного маршрута"></div><div class="map-legend"><span><i class="legend-dot from-dot"></i>Отправление</span><span><i class="legend-dot to-dot"></i>Доставка</span></div><div class="map-loading" id="mapLoading"><span></span> Загружаем карту…</div></div>
-            <div class="map-footnote"><span id="routeStatus" role="status">Прокладываем автомобильный маршрут…</span> · © OpenStreetMap, <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noreferrer">исправить карту</a> · границы Natural Earth · маршрутизация <a href="https://routing.openstreetmap.de/about.html" target="_blank" rel="noreferrer">FOSSGIS</a></div>
+            <div class="map-footnote"><span id="mapProvider" role="status">Карта: Яндекс</span> · <span id="routeStatus" role="status">Прокладываем автомобильный маршрут…</span> · © OpenStreetMap, <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noreferrer">данные маршрутов</a> · границы Natural Earth · маршрутизация <a href="https://routing.openstreetmap.de/about.html" target="_blank" rel="noreferrer">FOSSGIS</a></div>
             <div class="wizard-actions wizard-actions-end"><button type="button" id="nextFromRoute" class="wizard-button primary" disabled>Указать детали груза <span>→</span></button></div>
           </section>
 
@@ -125,6 +126,8 @@
   </main>
   <footer><a class="brand footer-brand" href="#top"><span class="brand-mark">П</span><span>ПЕРЕВЕЗЁМ<span class="brand-dot">.</span></span></a><span>Перевозка вещей по России · Renault Master 2020</span><a href="#calculator">Рассчитать маршрут</a><span class="copyright">© 2026</span></footer>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="map-config.js"></script>
+  <script src="map-tiles.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
