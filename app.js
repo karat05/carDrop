@@ -105,7 +105,7 @@
       `Вес: ${d.weight ? `${d.weight} кг` : 'не указан'} · Объём: ${d.volume ? `${d.volume} м³` : 'не указан'}`,
       ...detailsLines().filter(line => !/^(Груз:|Вес:|Объём:|Дата:|Время:|Комментарий:)/.test(line)), '',
       '📅 ДАТА И ПОЖЕЛАНИЯ', `Желаемая дата: ${date}`, `Удобное время: ${time}`, `Комментарий: ${d.comment || 'нет'}`, '',
-      '💰 ПРИМЕРНАЯ ЦЕНА С САЙТА', `Ориентир за дорогу: ${base}`, 'Расчёт по тарифу 50 ₽/км. Грузчики и дополнительные услуги в сумму не включены — итог согласуем в MAX.', '',
+      '💰 ПРИМЕРНАЯ ЦЕНА С САЙТА', `Ориентир за дорогу: ${base}`, 'Расчёт по тарифу 50 ₽/км. Грузчики и дополнительные услуги в сумму не включены — итог согласуем лично в мессенджере.', '',
       'Здравствуйте! Прошу уточнить итоговую стоимость и свободное время для перевозки.'
     ].join('\n');
   }
@@ -497,7 +497,7 @@
         buffer.style.cssText = 'position:fixed;opacity:0'; document.body.append(buffer); buffer.select();
         const copied = document.execCommand('copy'); buffer.remove(); if (!copied) throw new Error('copy failed');
       }
-      status.textContent = 'Скопировано — вставьте в чат MAX';
+      status.textContent = 'Скопировано — вставьте в выбранный мессенджер';
     } catch {
       showStep(3); const preview = document.querySelector('#messagePreview'); preview.value = message; preview.focus(); preview.select();
       status.textContent = 'Выделили текст — скопируйте его вручную';

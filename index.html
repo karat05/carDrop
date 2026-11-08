@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b0c12" />
-  <meta name="description" content="Узнайте примерную стоимость перевозки вещей по России на Renault Master 2020. Услуги и точную цену согласуйте напрямую в MAX." />
+  <meta name="description" content="Узнайте примерную стоимость перевозки вещей по России на Renault Master 2020. Услуги и точную цену согласуйте напрямую в удобном мессенджере." />
   <title>Перевезём — перевозка вещей по России</title>
   <link rel="preconnect" href="https://unpkg.com" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -25,7 +25,7 @@
       <div class="hero-copy">
         <div class="eyebrow"><span class="eyebrow-line"></span> ПЕРЕВОЗКА ВЕЩЕЙ ПО РОССИИ</div>
         <h1>Ваши вещи.<br /><span>Наш маршрут.</span></h1>
-        <p class="hero-text">Перевозка по России на Renault Master. Узнайте примерную цену, соберите детали и отправьте заявку в MAX.</p>
+        <p class="hero-text">Перевозка по России на Renault Master. Узнайте примерную цену, соберите детали и отправьте заявку в удобный мессенджер.</p>
         <a class="hero-cta" href="#calculator">Рассчитать поездку <span>↓</span></a>
         <div class="hero-proof"><div class="proof-icon">✳</div><div><b>50 ₽ за километр</b><small>Понятный тариф без сюрпризов</small></div></div>
       </div>
@@ -41,13 +41,13 @@
     </section>
 
     <section class="calculator-section" id="calculator">
-      <div class="section-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> ПОНЯТНЫЙ РАСЧЁТ БЕЗ ОПЛАТЫ НА САЙТЕ</div><h2>Рассчитайте перевозку</h2></div><p>Сначала маршрут и условия.<br />Точную стоимость согласуем лично в MAX.</p></div>
+      <div class="section-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> ПОНЯТНЫЙ РАСЧЁТ БЕЗ ОПЛАТЫ НА САЙТЕ</div><h2>Рассчитайте перевозку</h2></div><p>Сначала маршрут и условия.<br />Точную стоимость согласуем лично в мессенджере.</p></div>
       <div class="wizard-progress" aria-label="Этапы расчёта">
         <div class="wizard-progress-step active" data-progress="1"><span>01</span><b>Маршрут</b></div><i></i>
         <div class="wizard-progress-step" data-progress="2"><span>02</span><b>Груз</b></div><i></i>
         <div class="wizard-progress-step" data-progress="3"><span>03</span><b>Расчёт</b></div>
       </div>
-      <div class="quote-toolbar"><p>Все шаги → одно сообщение в MAX</p><div><button type="button" id="copyQuote" class="copy-button">⧉ Скопировать всю заявку</button><span id="copyStatus" role="status" aria-live="polite"></span></div></div>
+      <div class="quote-toolbar"><p>Все шаги → одна заявка для MAX или WhatsApp</p><div><button type="button" id="copyQuote" class="copy-button">⧉ Скопировать всю заявку</button><span id="copyStatus" role="status" aria-live="polite"></span></div></div>
       <div class="configurator wizard-layout">
         <div class="route-panel wizard-main">
           <section class="wizard-page active" data-page="1" aria-labelledby="step1Title">
@@ -66,7 +66,7 @@
           </section>
 
           <section class="wizard-page" data-page="2" aria-labelledby="step2Title" hidden>
-            <div class="wizard-page-heading"><span>ШАГ 2 ИЗ 3</span><h3 id="step2Title">Детали для сообщения в MAX</h3><p>Заполните, что знаете. Эти данные попадут в общий текст заявки — повторять их в чате не придётся.</p></div>
+            <div class="wizard-page-heading"><span>ШАГ 2 ИЗ 3</span><h3 id="step2Title">Детали для сообщения</h3><p>Заполните, что знаете. Эти данные попадут в общий текст заявки — повторять их в чате не придётся.</p></div>
             <div class="cargo-fields">
               <label class="detail-field detail-wide">Что перевозим?<input type="text" data-trip-detail="cargo" placeholder="Например, мебель и коробки" maxlength="100" /></label>
               <div class="detail-grid">
@@ -91,7 +91,7 @@
                 <label class="detail-field">Удобное время подачи<input type="time" data-trip-detail="time" /></label>
               </div>
               <label class="detail-field detail-wide">Комментарий<textarea data-trip-detail="comment" maxlength="500" rows="3" placeholder="Хрупкие вещи, крупногабаритные предметы и другие пожелания"></textarea></label>
-              <p class="rates-note">Сейчас показана предварительная стоимость дороги по тарифу 50 ₽/км. Грузчики и дополнительные условия, включая этажи и лифты, согласуем в MAX.</p>
+              <p class="rates-note">Сейчас показана предварительная стоимость дороги по тарифу 50 ₽/км. Грузчики и дополнительные условия, включая этажи и лифты, согласуем лично в мессенджере.</p>
             </div>
             <div class="wizard-actions"><button type="button" class="wizard-button secondary" data-prev>← Назад</button><button type="button" id="nextToEstimate" class="wizard-button primary">Показать расчёт <span>→</span></button></div>
           </section>
@@ -101,8 +101,8 @@
             <div class="final-depot">Старт: улица Пески Набережные, 1, Александров</div><div class="final-route"><span id="finalRouteFrom">Москва</span><span class="final-route-arrow">→</span><span id="finalRouteTo">Казань</span></div>
             <div class="leg-summary"><span>База → погрузка <b data-route-leg="pickup">— км</b></span><span>Погрузка → доставка <b data-route-leg="delivery">— км</b></span><small>Возвращение на базу в расчёт не включено.</small></div>
             <div class="final-price-card"><span>ПРИМЕРНАЯ ЦЕНА ДО СОГЛАСОВАНИЯ УСЛУГ</span><strong id="finalPrice">— ₽</strong><small><span id="finalDistance">— км</span> × 50 ₽/км</small></div>
-            <div class="final-details" id="finalDetails"></div><label class="message-label" for="messagePreview">Готовый текст для MAX</label><textarea id="messagePreview" class="message-preview" readonly rows="10"></textarea>
-            <p class="final-disclaimer">Это примерная стоимость дороги, рассчитанная по километражу. Услуги грузчиков и другие условия пока не включены — итог уточним по всем деталям в MAX. Поездка не считается заказанной, пока вы лично не согласуете её с владельцем.</p>
+            <div class="final-details" id="finalDetails"></div><label class="message-label" for="messagePreview">Готовый текст для отправки в мессенджеры</label><textarea id="messagePreview" class="message-preview" readonly rows="10"></textarea>
+            <p class="final-disclaimer">Это примерная стоимость дороги, рассчитанная по километражу. Услуги грузчиков и другие условия пока не включены — итог уточним по всем деталям в переписке. Поездка не считается заказанной, пока вы лично не согласуете её с владельцем.</p>
             <p class="contact-choice-label">Куда отправить заявку?</p>
             <div class="contact-choices">
               <a id="maxCta" class="contact-option contact-option-max" href="https://max.ru/:share?text=Здравствуйте%21%20Хочу%20уточнить%20расчёт%20перевозки." target="_blank" rel="noreferrer"><span class="contact-option-icon">M</span><span><b>Написать в MAX</b><small>Роману · +7 916 349-07-15</small></span><i>↗</i></a>
@@ -121,8 +121,8 @@
           <div class="estimate-distance"><span>Тариф за дорогу</span><b>50 ₽ <small>/ км</small></b></div>
           <div class="estimate-price-label">ПРИМЕРНАЯ ЦЕНА ДО СОГЛАСОВАНИЯ УСЛУГ</div>
           <div class="estimate-price" id="priceValue">— <span>₽</span></div>
-          <div class="estimate-disclaimer">Сумма рассчитана только по дороге. Грузчики, этажи и типы лифтов согласуем отдельно в MAX. Сайт не принимает оплату и не бронирует автомобиль.</div>
-          <div class="estimate-mini-details" id="estimateDetails">Маршрут ещё не рассчитан</div><div class="summary-note"><b>Всё в одном сообщении</b><p>В заявке соберутся маршрут, груз, вес и объём, грузчики, этажи, типы лифтов, дата, время и комментарий. Скопируйте текст и отправьте Роману в MAX.</p></div>
+          <div class="estimate-disclaimer">Сумма рассчитана только по дороге. Грузчики, этажи и типы лифтов согласуем лично в мессенджере. Сайт не принимает оплату и не бронирует автомобиль.</div>
+          <div class="estimate-mini-details" id="estimateDetails">Маршрут ещё не рассчитан</div><div class="summary-note"><b>Одна заявка для MAX или WhatsApp</b><p>В ней соберутся маршрут, груз, вес и объём, грузчики, этажи, типы лифтов, дата, время и комментарий. Скопируйте текст или откройте его в выбранном мессенджере.</p></div>
           <div class="estimate-badges"><span>✓ До 2 т</span><span>✓ По России</span></div>
         </aside>
       </div>
@@ -132,9 +132,9 @@
       <div class="vehicle-image"><span class="eyebrow">ВАШ АВТОМОБИЛЬ</span><img src="assets/renault-master-2020-3d.png" alt="Графитовый Renault Master 2020" loading="lazy" /></div>
       <div class="vehicle-info"><div class="eyebrow">ОДИН ФУРГОН ДЛЯ ВАШИХ ЗАДАЧ</div><h2>Переезд, мебель<br />или важный груз.</h2><p>Цельнометаллический Renault Master 2020. По городу и между городами — на любое расстояние.</p><div class="vehicle-specs"><div><b>2 т</b><span>до · грузоподъёмность</span></div><div><b>3,7 × 2,2 × 1,7 м</b><span>длина × высота × ширина кузова</span></div></div></div>
     </section>
-    <section class="handoff-section" id="max-contact"><div class="handoff-head"><div class="eyebrow">ОТ РАСЧЁТА К ПОЕЗДКЕ</div><h2>Договоримся<br /><span>в MAX.</span></h2><p class="owner-experience">Перевозками занимаюсь с 2021 года.<br />За рулём — более 20 лет.</p><a class="hero-cta" href="#calculator">Собрать заявку <span>↗</span></a></div><div class="handoff-grid" id="steps"><article><span>01 / МАРШРУТ</span><h3>Узнайте ориентир</h3><p>Выберите адреса. Покажем дорожный маршрут и цену по 50 ₽ за километр.</p></article><article><span>02 / ДЕТАЛИ</span><h3>Скопируйте всю заявку</h3><p>Укажите груз, грузчиков, этажи, типы лифтов, дату и время подачи. Одна кнопка соберёт всё в сообщение.</p></article><article><span>03 / ЛИЧНЫЙ ЧАТ</span><h3>Уточните и согласуйте</h3><p>Выберите MAX или WhatsApp. Уточните цену, приложите фото вещей и согласуйте удобное время.</p></article></div></section>
+    <section class="handoff-section" id="max-contact"><div class="handoff-head"><div class="eyebrow">ОТ РАСЧЁТА К ПОЕЗДКЕ</div><h2>Выберите<br /><span>мессенджер.</span></h2><p class="owner-experience">Перевозками занимаюсь с 2021 года.<br />За рулём — более 20 лет.</p><a class="hero-cta" href="#calculator">Собрать заявку <span>↗</span></a></div><div class="handoff-grid" id="steps"><article><span>01 / МАРШРУТ</span><h3>Узнайте ориентир</h3><p>Выберите адреса. Покажем дорожный маршрут и цену по 50 ₽ за километр.</p></article><article><span>02 / ДЕТАЛИ</span><h3>Скопируйте всю заявку</h3><p>Укажите груз, грузчиков, этажи, типы лифтов, дату и время подачи. Одна кнопка соберёт всё в сообщение.</p></article><article><span>03 / ЛИЧНЫЙ ЧАТ</span><h3>Уточните и согласуйте</h3><p>Выберите MAX или WhatsApp. Уточните цену, приложите фото вещей и согласуйте удобное время.</p></article></div></section>
   </main>
-  <footer><a class="brand footer-brand" href="#top"><span class="brand-mark">П</span><span>ПЕРЕВЕЗЁМ<span class="brand-dot">.</span></span></a><span>Перевозка вещей по России · Renault Master 2020</span><a href="#calculator">Рассчитать маршрут</a><span class="copyright">Работаю с 2021 года</span></footer>
+  <footer><a class="brand footer-brand" href="#top"><span class="brand-mark">П</span><span>ПЕРЕВЕЗЁМ<span class="brand-dot">.</span></span></a><span>Перевозка вещей по России · Renault Master 2020</span><a href="#calculator">Рассчитать маршрут</a><span class="copyright">Работаю с 2021 года · © 2026</span></footer>
   <script src="map-tiles.js"></script>
   <script type="importmap">
     {"imports":{"leaflet":"https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js","maplibre-gl":"https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.mjs"}}
