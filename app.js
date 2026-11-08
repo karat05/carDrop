@@ -324,6 +324,7 @@
       return;
     }
     map = L.map('map', { zoomControl: false, scrollWheelZoom: true, wheelPxPerZoomLevel: 100 }).setView([61.5, 93], 3);
+    map.attributionControl.setPrefix(false);
     window.CardropMapTiles.mount(L, map, window.CARDROP_MAP_CONFIG, state => {
       document.querySelector('#mapProvider').textContent = state.provider === 'hot'
         ? 'Карта: OpenStreetMap · стиль HOT'
