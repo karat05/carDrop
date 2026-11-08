@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f3eb" />
+  <meta name="description" content="Рассчитайте примерную стоимость перевозки вещей по России на цельнометаллическом Renault Master. 50 ₽ за километр, до 2 тонн." />
+  <title>Перевезём — перевозка вещей по России</title>
+  <link rel="preconnect" href="https://unpkg.com" />
+  <link rel="preconnect" href="https://tile.openstreetmap.org" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Перевезём — на главную"><span class="brand-mark">П</span><span>ПЕРЕВЕЗЁМ<span class="brand-dot">.</span></span></a>
+    <nav class="nav" aria-label="Главная навигация"><a href="#calculator">Рассчитать</a><a href="#van">Автомобиль</a><a href="#steps">Как работаем</a></nav>
+    <a class="phone" href="#calculator"><span class="phone-icon">↗</span> ЗАКАЗАТЬ ПЕРЕВОЗКУ</a>
+    <button class="menu-toggle" aria-label="Открыть меню">☰</button>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-line"></span> ПЕРЕВОЗКА ВЕЩЕЙ ПО РОССИИ</div>
+        <h1>Ваши вещи.<br /><span>В пути.</span></h1>
+        <p class="hero-text">Перевезём мебель, технику и всё, что важно. Один фургон — один понятный маршрут.</p>
+        <a class="hero-cta" href="#calculator">Рассчитать поездку <span>↓</span></a>
+        <div class="hero-proof"><div class="proof-icon">✳</div><div><b>50 ₽ за километр</b><small>Понятный тариф без сюрпризов</small></div></div>
+      </div>
+      <div class="hero-art" aria-label="Иллюстрация фургона Renault Master на маршруте">
+        <div class="art-sun"></div><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+        <div class="route-label label-a"><i></i> ОТКУДА</div><div class="route-label label-b"><i></i> КУДА</div>
+        <svg class="van-illustration" viewBox="0 0 680 360" role="img" aria-label="Белый грузовой фургон"><ellipse cx="333" cy="315" rx="275" ry="21" fill="#dad8cb"/><path d="M91 112Q91 91 116 91h322v181H91z" fill="#fdfcf8"/><path d="M438 133h103q19 0 29 18l44 76v45H438z" fill="#fdfcf8"/><path d="M467 150h65q10 0 16 10l34 54h-115z" fill="#26322d"/><path d="M114 111h294v9H114z" fill="#d9ddd6"/><path d="M107 261h492v16H107z" fill="#242d28"/><path d="M135 282h456v10H135z" fill="#d7d6ca"/><path d="M460 224h91v31h-91z" fill="#f0b833"/><path d="M108 223h12v32h-12zM595 224h11v32h-11z" fill="#f1bd35"/><circle cx="188" cy="278" r="35" fill="#202824"/><circle cx="188" cy="278" r="17" fill="#c9c9bd"/><circle cx="516" cy="278" r="35" fill="#202824"/><circle cx="516" cy="278" r="17" fill="#c9c9bd"/><path d="M151 280h74M479 280h74" stroke="#a6a79e" stroke-width="4"/><path d="M253 151h108" stroke="#e7e7df" stroke-width="2"/><path d="M252 171h108" stroke="#e7e7df" stroke-width="2"/><text x="248" y="222" fill="#28312c" font-family="Arial,sans-serif" font-weight="700" font-size="19" letter-spacing="3">ПЕРЕВЕЗЁМ</text><text x="252" y="241" fill="#90958d" font-family="Arial,sans-serif" font-size="10" letter-spacing="2">RENAULT MASTER · 2020</text><path d="M87 267h512" stroke="#f0b833" stroke-width="5"/></svg>
+        <div class="art-caption"><span class="caption-number">01</span><span>Один проверенный<br />фургон для ваших вещей</span><span class="caption-arrow">↗</span></div>
+      </div>
+      <div class="hero-bottom"><span>ЛЮБОЕ РАССТОЯНИЕ</span><span class="bottom-dash"></span><span>ДО 2 ТОНН</span><span class="bottom-dash"></span><span>ПО ВСЕЙ РОССИИ</span></div>
+    </section>
+
+    <section class="calculator-section" id="calculator">
+      <div class="section-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> МАРШРУТ И СТОИМОСТЬ</div><h2>Куда доставить?</h2></div><p>Выберите города или укажите точки на карте.<br />Мы покажем примерную стоимость поездки.</p></div>
+      <div class="configurator">
+        <div class="route-panel">
+          <div class="route-inputs">
+            <div class="route-rail"><span class="rail-start"></span><span class="rail-line"></span><span class="rail-end"></span></div>
+            <label class="field"><span>ОТКУДА</span><div class="input-wrap"><input id="fromInput" value="Москва" autocomplete="off" placeholder="Город отправления" /><button class="clear-input" aria-label="Очистить город отправления">×</button></div><div class="suggestions" id="fromSuggest"></div></label>
+            <button class="swap-button" id="swapRoute" aria-label="Поменять города местами">↕</button>
+            <label class="field"><span>КУДА</span><div class="input-wrap"><input id="toInput" value="Казань" autocomplete="off" placeholder="Город доставки" /><button class="clear-input" aria-label="Очистить город назначения">×</button></div><div class="suggestions" id="toSuggest"></div></label>
+          </div>
+          <div class="map-tools"><span class="map-hint"><span class="hint-pulse"></span>Сначала точка отправления, затем доставка</span><button id="locateMe" class="locate-button">◎ Моя геопозиция</button></div>
+          <div class="map-frame"><div id="map" role="application" aria-label="Карта для выбора маршрута"></div><div class="map-legend"><span><i class="legend-dot from-dot"></i>Отправление</span><span><i class="legend-dot to-dot"></i>Доставка</span></div><div class="map-loading" id="mapLoading"><span></span> Загружаем карту…</div></div>
+          <div class="map-footnote"><span id="routeStatus">Прокладываем автомобильный маршрут…</span> · © OpenStreetMap, <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noreferrer">исправить карту</a> · <a href="https://naturalearthdata.com/" target="_blank" rel="noreferrer">границы Natural Earth</a> · маршрутизация <a href="https://routing.openstreetmap.de/about.html" target="_blank" rel="noreferrer">FOSSGIS</a></div>
+        </div>
+        <aside class="estimate-card">
+          <div class="estimate-top"><span>ВАШ РАСЧЁТ</span><span class="live-dot"></span></div>
+          <div class="estimate-route"><div id="estimateFrom">Москва</div><span>↓</span><div id="estimateTo">Казань</div></div>
+          <div class="estimate-separator"></div>
+          <div class="estimate-distance"><span>Расстояние</span><b id="distanceValue">— км</b></div>
+          <div class="estimate-distance"><span>Тариф</span><b>50 ₽ <small>/ км</small></b></div>
+          <div class="estimate-price-label">ПРИМЕРНАЯ СТОИМОСТЬ</div>
+          <div class="estimate-price" id="priceValue">— <span>₽</span></div>
+          <div class="estimate-disclaimer">Цена считается по длине автомобильного маршрута OpenStreetMap. Ограничения дорог по высоте и массе фургона уточняются отдельно; итог зависит от адресов и условий загрузки.</div>
+          <a class="order-button" href="#calculator">Рассчитать маршрут <span>↗</span></a>
+          <div class="estimate-badges"><span>✓ До 2 т</span><span>✓ Любое расстояние</span></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="van-section" id="van">
+      <div class="van-photo-side"><div class="van-photo-frame"><div class="photo-tag">НАШ АВТОМОБИЛЬ <span>01 / 01</span></div><div class="van-photo-art"><div class="photo-sun"></div><svg viewBox="0 0 720 410" role="img" aria-label="Renault Master 2020, цельнометаллический фургон"><ellipse cx="365" cy="352" rx="300" ry="24" fill="#c9c7b8"/><path d="M102 132q0-24 28-24h357v200H102z" fill="#faf9f4"/><path d="M487 153h104q24 0 36 20l48 86v49H487z" fill="#faf9f4"/><path d="M514 171h73q10 0 17 11l36 63H514z" fill="#28322d"/><path d="M117 321h555v18H117z" fill="#242d28"/><path d="M132 335h523" stroke="#efb632" stroke-width="5"/><path d="M515 273h111v30H515z" fill="#efb632"/><circle cx="209" cy="332" r="39" fill="#202824"/><circle cx="209" cy="332" r="19" fill="#bfc0b4"/><circle cx="564" cy="332" r="39" fill="#202824"/><circle cx="564" cy="332" r="19" fill="#bfc0b4"/><path d="M158 165h288M158 187h288" stroke="#e4e4dc" stroke-width="2"/><text x="234" y="256" font-family="Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="2" fill="#28322d">RENAULT MASTER</text></svg><div class="photo-ground"></div></div></div></div>
+      <div class="van-copy"><div class="eyebrow"><span class="eyebrow-line"></span> ПРОСТРАНСТВО ДЛЯ ВАЖНОГО</div><h2 id="van-title">Всё поместится.<br /><span>И доедет.</span></h2><p>Цельнометаллический фургон Renault Master 2020 года — для переезда, мебели, техники и коммерческих грузов.</p><div class="spec-grid"><div class="spec"><b>до 2<span> т</span></b><small>грузоподъёмность</small></div><div class="spec"><b>3,7<span> м</span></b><small>длина кузова</small></div><div class="spec"><b>2,2<span> м</span></b><small>высота кузова</small></div><div class="spec"><b>1,7<span> м</span></b><small>ширина кузова</small></div></div><div class="van-note"><span>↳</span> Любое расстояние — от соседнего района до другого края России</div></div>
+    </section>
+
+    <section class="steps-section" id="steps"><div class="steps-head"><div class="eyebrow"><span class="eyebrow-line"></span> ВСЁ ПРОСТО</div><h2>Четыре шага<br />до нового адреса.</h2><p>Вы рассказываете, что нужно перевезти.<br />Мы берём дорогу на себя.</p></div><div class="steps-grid"><div class="step"><span class="step-index">01</span><div class="step-icon">⌖</div><h3>Выберите маршрут</h3><p>Укажите города или отметьте места на карте — посчитаем примерную цену.</p></div><div class="step"><span class="step-index">02</span><div class="step-icon">▤</div><h3>Расскажите о грузе</h3><p>Опишите вещи, объём, этажи и желаемую дату поездки.</p></div><div class="step"><span class="step-index">03</span><div class="step-icon">↗</div><h3>Согласуем детали</h3><p>Уточним адреса, время и итоговую стоимость до начала перевозки.</p></div><div class="step"><span class="step-index">04</span><div class="step-icon">✓</div><h3>Доставим бережно</h3><p>Приедем в согласованное время и привезём вещи по адресу назначения.</p></div></div></section>
+
+    <section class="closing"><div><div class="eyebrow"><span class="eyebrow-line"></span> ПОРА В ДОРОГУ</div><h2>Вещи готовы.<br />Маршрут тоже.</h2></div><a href="#calculator" class="closing-link">Рассчитать поездку <span>↗</span></a><div class="closing-mark">П.</div></section>
+  </main>
+  <footer><a class="brand footer-brand" href="#top"><span class="brand-mark">П</span><span>ПЕРЕВЕЗЁМ<span class="brand-dot">.</span></span></a><span>Перевозка вещей по России · Renault Master 2020</span><a href="#calculator">Рассчитать маршрут</a><span class="copyright">© 2026</span></footer>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
