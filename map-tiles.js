@@ -5,6 +5,7 @@
 })(typeof window !== 'undefined' ? window : globalThis, function () {
   'use strict';
   const libertyStyle = 'https://tiles.openfreemap.org/styles/liberty';
+  const libertyAttribution = '<a href="https://openfreemap.org/" target="_blank" rel="noopener noreferrer">© OpenMapTiles · данные OpenStreetMap</a>';
   const osmAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>';
 
   function mount(L, map, _config = {}, onChange = function () {}) {
@@ -22,7 +23,12 @@
     }
 
     try {
-      activeLayer = window.CardropMapLibreGL({ style: libertyStyle }).addTo(map);
+      activeLayer = window.CardropMapLibreGL({ style: libertyStyle });
+      // Preserve both required credits while keeping one compact attribution link.
+      if (typeof activeLayer.getAttribution === 'function') {
+        activeLayer.getAttribution = () => libertyAttribution;
+      }
+      activeLayer.addTo(map);
       const glMap = activeLayer.getMaplibreMap();
       let resourceErrors = 0;
       glMap.on('error', event => {
