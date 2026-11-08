@@ -103,8 +103,12 @@
             <div class="final-price-card"><span>ПРИМЕРНАЯ ЦЕНА ДО СОГЛАСОВАНИЯ УСЛУГ</span><strong id="finalPrice">— ₽</strong><small><span id="finalDistance">— км</span> × 50 ₽/км</small></div>
             <div class="final-details" id="finalDetails"></div><label class="message-label" for="messagePreview">Готовый текст для MAX</label><textarea id="messagePreview" class="message-preview" readonly rows="10"></textarea>
             <p class="final-disclaimer">Это примерная стоимость дороги, рассчитанная по километражу. Услуги грузчиков и другие условия пока не включены — итог уточним по всем деталям в MAX. Поездка не считается заказанной, пока вы лично не согласуете её с владельцем.</p>
-            <a id="maxCta" class="max-cta" href="https://max.ru/:share?text=Здравствуйте%21%20Хочу%20уточнить%20расчёт%20перевозки." target="_blank" rel="noreferrer">Открыть MAX и написать Роману <span>↗</span></a>
-            <p class="max-hint">В MAX найдите Романа по номеру <b>+7 916 349-07-15</b>. Текст заявки будет подготовлен для отправки.</p>
+            <p class="contact-choice-label">Куда отправить заявку?</p>
+            <div class="contact-choices">
+              <a id="maxCta" class="contact-option contact-option-max" href="https://max.ru/:share?text=Здравствуйте%21%20Хочу%20уточнить%20расчёт%20перевозки." target="_blank" rel="noreferrer"><span class="contact-option-icon">M</span><span><b>Написать в MAX</b><small>Роману · +7 916 349-07-15</small></span><i>↗</i></a>
+              <a id="waCta" class="contact-option contact-option-wa" href="https://wa.me/79163490715" target="_blank" rel="noreferrer"><span class="contact-option-icon">◉</span><span><b>Написать в WhatsApp</b><small>Тот же номер</small></span><i>↗</i></a>
+            </div>
+            <p class="max-hint">Заявка будет подготовлена в выбранном мессенджере. Проверьте текст и отправьте его.</p>
             <div class="wizard-actions"><button type="button" class="wizard-button secondary" data-prev>← Изменить детали</button><button type="button" id="editRoute" class="wizard-button secondary">Изменить маршрут →</button></div>
           </section>
         </div>
@@ -128,9 +132,9 @@
       <div class="vehicle-image"><span class="eyebrow">ВАШ АВТОМОБИЛЬ</span><img src="assets/renault-master-2020-3d.png" alt="Графитовый Renault Master 2020" loading="lazy" /></div>
       <div class="vehicle-info"><div class="eyebrow">ОДИН ФУРГОН ДЛЯ ВАШИХ ЗАДАЧ</div><h2>Переезд, мебель<br />или важный груз.</h2><p>Цельнометаллический Renault Master 2020. По городу и между городами — на любое расстояние.</p><div class="vehicle-specs"><div><b>2 т</b><span>до · грузоподъёмность</span></div><div><b>3,7 × 2,2 × 1,7 м</b><span>длина × высота × ширина кузова</span></div></div></div>
     </section>
-    <section class="handoff-section" id="max-contact"><div class="handoff-head"><div class="eyebrow">ОТ РАСЧЁТА К ПОЕЗДКЕ</div><h2>Договоримся<br /><span>в MAX.</span></h2><a class="hero-cta" href="#calculator">Собрать заявку <span>↗</span></a></div><div class="handoff-grid" id="steps"><article><span>01 / МАРШРУТ</span><h3>Узнайте ориентир</h3><p>Выберите адреса. Покажем дорожный маршрут и цену по 50 ₽ за километр.</p></article><article><span>02 / ДЕТАЛИ</span><h3>Скопируйте всю заявку</h3><p>Укажите груз, грузчиков, этажи, типы лифтов, дату и время подачи. Одна кнопка соберёт всё в сообщение.</p></article><article><span>03 / ЛИЧНЫЙ ЧАТ</span><h3>Уточните и согласуйте</h3><p>Вставьте заявку в MAX, приложите фото вещей и согласуйте цену и время подачи напрямую.</p></article></div></section>
+    <section class="handoff-section" id="max-contact"><div class="handoff-head"><div class="eyebrow">ОТ РАСЧЁТА К ПОЕЗДКЕ</div><h2>Договоримся<br /><span>в MAX.</span></h2><p class="owner-experience">Перевозками занимаюсь с 2021 года.<br />За рулём — более 20 лет.</p><a class="hero-cta" href="#calculator">Собрать заявку <span>↗</span></a></div><div class="handoff-grid" id="steps"><article><span>01 / МАРШРУТ</span><h3>Узнайте ориентир</h3><p>Выберите адреса. Покажем дорожный маршрут и цену по 50 ₽ за километр.</p></article><article><span>02 / ДЕТАЛИ</span><h3>Скопируйте всю заявку</h3><p>Укажите груз, грузчиков, этажи, типы лифтов, дату и время подачи. Одна кнопка соберёт всё в сообщение.</p></article><article><span>03 / ЛИЧНЫЙ ЧАТ</span><h3>Уточните и согласуйте</h3><p>Выберите MAX или WhatsApp. Уточните цену, приложите фото вещей и согласуйте удобное время.</p></article></div></section>
   </main>
-  <footer><a class="brand footer-brand" href="#top"><span class="brand-mark">П</span><span>ПЕРЕВЕЗЁМ<span class="brand-dot">.</span></span></a><span>Перевозка вещей по России · Renault Master 2020</span><a href="#calculator">Рассчитать маршрут</a><span class="copyright">© 2026</span></footer>
+  <footer><a class="brand footer-brand" href="#top"><span class="brand-mark">П</span><span>ПЕРЕВЕЗЁМ<span class="brand-dot">.</span></span></a><span>Перевозка вещей по России · Renault Master 2020</span><a href="#calculator">Рассчитать маршрут</a><span class="copyright">Работаю с 2021 года</span></footer>
   <script src="map-tiles.js"></script>
   <script type="importmap">
     {"imports":{"leaflet":"https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js","maplibre-gl":"https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.mjs"}}

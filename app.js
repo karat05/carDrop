@@ -119,7 +119,9 @@
     const visibleDetails = estimateDetails.filter(line => !line.startsWith('Комментарий:')).slice(0, 8);
     document.querySelector('#estimateDetails').textContent = visibleDetails.length ? visibleDetails.join(' · ') : 'Укажите условия груза на следующем шаге';
     document.querySelector('#messagePreview').value = createMaxMessage();
-    const share = new URL(maxShareUrl); share.searchParams.set('text', createMaxMessage()); document.querySelector('#maxCta').href = share.toString();
+    const message = createMaxMessage();
+    const share = new URL(maxShareUrl); share.searchParams.set('text', message); document.querySelector('#maxCta').href = share.toString();
+    const whatsapp = new URL('https://wa.me/79163490715'); whatsapp.searchParams.set('text', message); document.querySelector('#waCta').href = whatsapp.toString();
     const canRoute = routeDistanceMeters !== null;
     nextRouteButton.disabled = !canRoute;
     if (!canRoute) {
@@ -142,6 +144,9 @@
     const maxUrl = new URL(maxShareUrl);
     maxUrl.searchParams.set('text', createMaxMessage());
     document.querySelector('#maxCta').href = maxUrl.toString();
+    const whatsappUrl = new URL('https://wa.me/79163490715');
+    whatsappUrl.searchParams.set('text', createMaxMessage());
+    document.querySelector('#waCta').href = whatsappUrl.toString();
   }
 
   function escapeHtml(value) {
