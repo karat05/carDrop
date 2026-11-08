@@ -29,3 +29,8 @@ html,body{overflow-x:clip}body{width:100%}.hero-art,.ambient-bg{contain:paint;ov
 @media(max-width:760px){.scene-city{height:315px;top:-35px}.scene-trees{height:305px;top:-35px}}
 .scene-city{translate:0 -14px}.scene-trees{translate:0 -30px}
 @media(max-width:760px){.scene-city{translate:0 -10px}.scene-trees{translate:0 -22px}}
+:root{--scene-drift:0px}
+.hero-art{translate:var(--scene-drift) 0;will-change:translate}
+.scene-halo,.scene-city,.scene-trees,.scene-road:after,.van-illustration{transform:none!important}
+.van-illustration{will-change:auto}
+@media(prefers-reduced-motion:reduce){.hero-art{translate:none!important}}

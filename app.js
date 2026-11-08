@@ -514,8 +514,9 @@
     sceneFrame = 0;
     const progress = Math.min(1, window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight));
     document.documentElement.style.setProperty('--page-progress', progress.toFixed(4));
-    document.documentElement.style.setProperty('--scene-shift', `${Math.min(window.scrollY * .17, 180)}px`);
-    document.documentElement.style.setProperty('--car-shift', `${-Math.min(window.scrollY * .09, 85)}px`);
+    const sceneDrift = -Math.min(window.scrollY * .09, 85);
+    document.documentElement.style.setProperty('--scene-drift', `${sceneDrift}px`);
+    document.documentElement.style.setProperty('--car-shift', `${sceneDrift}px`);
   }
   window.addEventListener('scroll', () => { if (!sceneFrame) sceneFrame = requestAnimationFrame(paintScene); }, {passive:true});
   paintScene();
