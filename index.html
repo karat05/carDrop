@@ -52,7 +52,7 @@
         <div class="route-panel wizard-main">
           <section class="wizard-page active" data-page="1" aria-labelledby="step1Title">
             <div class="wizard-page-heading"><span>ШАГ 1 ИЗ 3</span><h3 id="step1Title">Где забрать и куда доставить?</h3><p>Выезд с базы → погрузка → доставка. Укажите два адреса или выберите их на карте.</p></div>
-            <div class="depot-card"><span class="depot-lock">▣ БАЗА · ЗАКРЕПЛЕНА</span><strong>улица Пески Набережные, 1, Александров</strong><small>Начало каждого маршрута. Эту точку нельзя изменить или передвинуть.</small></div>
+            <div class="depot-card"><span class="depot-lock">▣ БАЗА · ЗАКРЕПЛЕНА</span><strong>Александров, улица Пески Набережные, 1</strong><small>Начало каждого маршрута. Эту точку нельзя изменить или передвинуть.</small></div>
             <div class="route-inputs">
               <div class="route-rail"><span class="rail-start"></span><span class="rail-line"></span><span class="rail-end"></span></div>
               <label class="field"><span>1 · ГДЕ ЗАБРАТЬ ГРУЗ</span><div class="input-wrap"><input id="fromInput" value="Москва" autocomplete="off" placeholder="Город, улица, дом" /><button class="clear-input" type="button" aria-label="Очистить адрес погрузки">×</button></div><div class="suggestions" id="fromSuggest"></div></label>
@@ -70,7 +70,7 @@
             <div class="cargo-fields">
               <label class="detail-field detail-wide">Что перевозим?<input type="text" data-trip-detail="cargo" placeholder="Например, мебель и коробки" maxlength="100" /></label>
               <div class="detail-grid">
-                <label class="detail-field">Вес, кг<input type="number" data-trip-detail="weight" min="0" max="2000" step="10" placeholder="Необязательно" /></label>
+                <label class="detail-field">Вес груза, кг · максимум 2 000<input type="number" data-trip-detail="weight" min="0" max="2000" step="10" placeholder="Необязательно" /></label>
                 <label class="detail-field">Объём, м³<input type="number" data-trip-detail="volume" min="0" max="30" step="0.5" placeholder="Необязательно" /></label>
               </div>
               <label class="detail-field detail-wide">Грузчики<select id="helpersSelect" data-trip-detail="helpers"><option value="0">Не нужны</option><option value="1">1 грузчик</option><option value="2">2 грузчика</option><option value="3">3 грузчика</option></select></label>
@@ -98,15 +98,20 @@
 
           <section class="wizard-page" data-page="3" aria-labelledby="step3Title" hidden>
             <div class="wizard-page-heading"><span>ШАГ 3 ИЗ 3</span><h3 id="step3Title">Ваша примерная стоимость</h3><p>Расчёт по дорожному маршруту. Без оплаты и автоматического бронирования.</p></div>
-            <div class="final-depot">Старт: улица Пески Набережные, 1, Александров</div><div class="final-route"><span id="finalRouteFrom">Москва</span><span class="final-route-arrow">→</span><span id="finalRouteTo">Казань</span></div>
-            <div class="leg-summary"><span>База → погрузка <b data-route-leg="pickup">— км</b></span><span>Погрузка → доставка <b data-route-leg="delivery">— км</b></span><small>Возвращение на базу в расчёт не включено.</small></div>
+            <div class="final-depot">Выезд из базы: Александров, улица Пески Набережные, 1</div><div class="final-route"><span id="finalRouteFrom">Москва</span><span class="final-route-arrow">→</span><span id="finalRouteTo">Казань</span></div>
+            <div class="route-legs" aria-label="Этапы маршрута">
+              <div class="route-leg"><span class="route-leg-index">01</span><div><small>База → погрузка</small><b data-route-leg="pickup">— км</b></div></div>
+              <span class="route-leg-arrow" aria-hidden="true">→</span>
+              <div class="route-leg"><span class="route-leg-index">02</span><div><small>Погрузка → доставка</small><b data-route-leg="delivery">— км</b></div></div>
+              <p class="route-return-note">↶ Возвращение на базу в расчёт не включено</p>
+            </div>
             <div class="final-price-card"><span>ПРИМЕРНАЯ ЦЕНА ДО СОГЛАСОВАНИЯ УСЛУГ</span><strong id="finalPrice">— ₽</strong><small><span id="finalDistance">— км</span> × 50 ₽/км</small></div>
             <div class="final-details" id="finalDetails"></div><label class="message-label" for="messagePreview">Готовый текст для отправки в мессенджеры</label><textarea id="messagePreview" class="message-preview" readonly rows="10"></textarea>
             <p class="final-disclaimer">Это примерная стоимость дороги, рассчитанная по километражу. Услуги грузчиков и другие условия пока не включены — итог уточним по всем деталям в переписке. Поездка не считается заказанной, пока вы лично не согласуете её с владельцем.</p>
             <p class="contact-choice-label">Куда отправить заявку?</p>
             <div class="contact-choices">
-              <a id="maxCta" class="contact-option contact-option-max" href="https://max.ru/:share?text=Здравствуйте%21%20Хочу%20уточнить%20расчёт%20перевозки." target="_blank" rel="noreferrer"><span class="contact-option-icon">M</span><span><b>Написать в MAX</b><small>Роману · +7 916 349-07-15</small></span><i>↗</i></a>
-              <a id="waCta" class="contact-option contact-option-wa" href="https://wa.me/79163490715" target="_blank" rel="noreferrer"><span class="contact-option-icon">◉</span><span><b>Написать в WhatsApp</b><small>Тот же номер</small></span><i>↗</i></a>
+              <a id="maxCta" class="contact-option contact-option-max" href="https://max.ru/:share?text=Здравствуйте%21%20Хочу%20уточнить%20расчёт%20перевозки." target="_blank" rel="noreferrer"><span class="contact-option-icon contact-option-icon-max" aria-hidden="true">MAX</span><span><b>Написать в MAX</b><small>Роман · +7 916 349-07-15</small></span><i>↗</i></a>
+              <a id="waCta" class="contact-option contact-option-wa" href="https://wa.me/79163490715" target="_blank" rel="noreferrer"><span class="contact-option-icon contact-option-icon-wa" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20.2 11.7a8.15 8.15 0 0 1-12.05 7.17L3.5 20l1.17-4.5A8.15 8.15 0 1 1 20.2 11.7Z"/><path d="M8.2 7.8c.2-.45.42-.47.65-.48h.55c.18 0 .4.07.5.36l.75 1.78c.08.2.04.4-.1.56l-.54.65c-.14.17-.2.32-.05.55a7 7 0 0 0 1.25 1.48c.54.48 1 .72 1.28.85.23.11.38.1.53-.08l.7-.83c.16-.19.34-.22.55-.13l1.7.8c.22.1.37.16.42.27.05.12.05.7-.2 1.23-.25.53-1.43 1.03-1.96 1.07-.5.05-1.15-.07-1.85-.35-.42-.17-.96-.4-1.65-.8a9.4 9.4 0 0 1-3.2-3.26c-.25-.43-.86-1.46-.86-2.54 0-1.09.57-1.62.78-1.91Z"/></svg></span><span><b>Написать в WhatsApp</b><small>Роман · +7 916 349-07-15</small></span><i>↗</i></a>
             </div>
             <p class="max-hint">Заявка будет подготовлена в выбранном мессенджере. Проверьте текст и отправьте его.</p>
             <div class="wizard-actions"><button type="button" class="wizard-button secondary" data-prev>← Изменить детали</button><button type="button" id="editRoute" class="wizard-button secondary">Изменить маршрут →</button></div>
@@ -114,7 +119,7 @@
         </div>
         <aside class="estimate-card" id="estimateCard">
           <div class="estimate-top"><span>ВАШ РАСЧЁТ</span><span class="live-dot"></span></div>
-          <div class="estimate-depot"><small>ВЫЕЗД С БАЗЫ</small><b>Александров, Пески Набережные, 1</b></div><div class="estimate-route"><div id="estimateFrom">Москва</div><span>↓</span><div id="estimateTo">Казань</div></div>
+          <div class="estimate-depot"><small>ВЫЕЗД С БАЗЫ</small><b>Александров, улица Пески Набережные, 1</b></div><div class="estimate-route"><div id="estimateFrom">Москва</div><span>↓</span><div id="estimateTo">Казань</div></div>
           <div class="leg-summary"><span>До погрузки <b data-route-leg="pickup">— км</b></span><span>С грузом <b data-route-leg="delivery">— км</b></span><small>Возвращение на базу не включено.</small></div>
           <div class="estimate-separator"></div>
           <div class="estimate-distance"><span>Всего по дорогам</span><b id="distanceValue">— км</b></div>
@@ -130,7 +135,7 @@
 
     <section class="vehicle-section" id="van">
       <div class="vehicle-image"><span class="eyebrow">ВАШ АВТОМОБИЛЬ</span><img src="assets/renault-master-2020-3d.png" alt="Графитовый Renault Master 2020" loading="lazy" /></div>
-      <div class="vehicle-info"><div class="eyebrow">ОДИН ФУРГОН ДЛЯ ВАШИХ ЗАДАЧ</div><h2>Переезд, мебель<br />или важный груз.</h2><p>Цельнометаллический Renault Master 2020. По городу и между городами — на любое расстояние.</p><div class="vehicle-specs"><div><b>2 т</b><span>до · грузоподъёмность</span></div><div><b>3,7 × 2,2 × 1,7 м</b><span>длина × высота × ширина кузова</span></div></div></div>
+      <div class="vehicle-info"><div class="eyebrow">ОДИН ФУРГОН ДЛЯ ВАШИХ ЗАДАЧ</div><h2>Переезд, мебель<br />или важный груз.</h2><p>Цельнометаллический Renault Master 2020. По городу и между городами — на любое расстояние.</p><div class="vehicle-specs"><div><b>2 000 кг</b><span>максимальная грузоподъёмность</span></div><div><b>3,7 × 2,2 × 1,7 м</b><span>длина × высота × ширина кузова</span></div></div></div>
     </section>
     <section class="handoff-section" id="max-contact"><div class="handoff-head"><div class="eyebrow">ОТ РАСЧЁТА К ПОЕЗДКЕ</div><h2>Выберите<br /><span>мессенджер.</span></h2><p class="owner-experience">Перевозками занимаюсь с 2021 года.<br />За рулём — более 20 лет.</p><a class="hero-cta" href="#calculator">Собрать заявку <span>↗</span></a></div><div class="handoff-grid" id="steps"><article><span>01 / МАРШРУТ</span><h3>Узнайте ориентир</h3><p>Выберите адреса. Покажем дорожный маршрут и цену по 50 ₽ за километр.</p></article><article><span>02 / ДЕТАЛИ</span><h3>Скопируйте всю заявку</h3><p>Укажите груз, грузчиков, этажи, типы лифтов, дату и время подачи. Одна кнопка соберёт всё в сообщение.</p></article><article><span>03 / ЛИЧНЫЙ ЧАТ</span><h3>Уточните и согласуйте</h3><p>Выберите MAX или WhatsApp. Уточните цену, приложите фото вещей и согласуйте удобное время.</p></article></div></section>
   </main>

@@ -3,7 +3,7 @@
   const rate = 50;
   const maxShareUrl = 'https://max.ru/:share';
   // OpenStreetMap building way/169667848: exact address confirmed at setup.
-  const depot = Object.freeze({ name: 'улица Пески Набережные, 1, Александров', lat: 56.3992489, lon: 38.7328341 });
+  const depot = Object.freeze({ name: 'Александров, улица Пески Набережные, 1', lat: 56.3992489, lon: 38.7328341 });
   const inputs = { from: document.querySelector('#fromInput'), to: document.querySelector('#toInput') };
   const suggestions = { from: document.querySelector('#fromSuggest'), to: document.querySelector('#toSuggest') };
   const points = {
@@ -394,7 +394,12 @@
         storage.set('helpers', saved);
       }
       if (saved !== null) field.type === 'checkbox' ? field.checked = saved === 'true' : field.value = saved;
+      if (field.dataset.tripDetail === 'weight' && Number(field.value) > 2000) {
+        field.value = '2000';
+        storage.set('weight', '2000');
+      }
       field.addEventListener('input', () => {
+        if (field.dataset.tripDetail === 'weight' && Number(field.value) > 2000) field.value = '2000';
         storage.set(field.dataset.tripDetail, field.type === 'checkbox' ? String(field.checked) : field.value);
         renderEstimate();
       });

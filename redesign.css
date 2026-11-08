@@ -34,3 +34,24 @@ html,body{overflow-x:clip}body{width:100%}.hero-art,.ambient-bg{contain:paint;ov
 .scene-halo,.scene-city,.scene-trees,.scene-road:after,.van-illustration{transform:none!important}
 .van-illustration{will-change:auto}
 @media(prefers-reduced-motion:reduce){.hero-art{translate:none!important}}
+
+/* Route estimate: pair each leg label with its own distance for quick scanning. */
+.route-legs{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);align-items:center;gap:10px;margin:18px 0 20px}
+.route-leg{min-width:0;display:flex;align-items:center;gap:12px;padding:14px;background:#ffffff08;border:1px solid #ffffff18;border-radius:14px}
+.route-leg-index{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:11px;background:#c8a4ff1c;color:#d8baff;font-size:12px;font-weight:800}
+.route-leg>div{display:grid;gap:5px;min-width:0}
+.route-leg small{font-size:13px;line-height:1.35;color:var(--muted)}
+.route-leg b{font-size:20px;line-height:1.2;font-variant-numeric:tabular-nums}
+.route-leg-arrow{text-align:center;color:var(--yellow);font-size:22px}
+.route-return-note{grid-column:1/-1;margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.final-price-card>span{font-size:13px;line-height:1.5}
+.final-details{gap:9px;font-size:15px;line-height:1.65}
+.message-label{font-size:15px}
+.message-preview{font-size:15px;line-height:1.6}
+.final-disclaimer{font-size:14px;line-height:1.7}
+.vehicle-specs b{font-size:27px}
+.vehicle-specs span{font-size:14px;line-height:1.45}
+.contact-option-icon-max{font-size:9px;letter-spacing:-.04em}
+.contact-option-icon-wa svg{display:block;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:760px){.route-legs{grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);gap:6px;margin:14px 0 18px}.route-leg{gap:8px;padding:10px 8px}.route-leg-index{width:28px;height:28px;flex-basis:28px;border-radius:9px;font-size:11px}.route-leg small{font-size:12px}.route-leg b{font-size:17px}.route-return-note{font-size:12px}.final-price-card>span{font-size:12px}.final-details{font-size:14px}.message-label{font-size:14px}.message-preview{font-size:14px;min-height:250px}.final-disclaimer{font-size:13px}.vehicle-specs b{font-size:23px}.vehicle-specs span{font-size:13px}}
+@media(max-width:380px){.route-legs{grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr);gap:4px}.route-leg{gap:6px;padding:9px 6px}.route-leg small{font-size:11px}.route-leg b{font-size:15px}}
