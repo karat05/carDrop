@@ -1,5 +1,6 @@
 (() => {
   const rate = 50;
+  const maxShareUrl = 'https://max.ru/:share';
   const inputs = { from: document.querySelector('#fromInput'), to: document.querySelector('#toInput') };
   const suggestions = { from: document.querySelector('#fromSuggest'), to: document.querySelector('#toSuggest') };
   const points = {
@@ -10,13 +11,27 @@
     from: 'background:#829354;box-shadow:0 0 0 5px #82935430',
     to: 'background:#e1ad2e;box-shadow:0 0 0 5px #e1ad2e38'
   };
-  let map, markers = {}, routeLine, routeDistanceMeters = null;
-  let clickNext = 'from', searchTimers = {}, routeToken = 0, lastRouteRequestAt = 0;
+  const pages = [...document.querySelectorAll('.wizard-page')];
   const routeStatus = document.querySelector('#routeStatus');
+  const nextRouteButton = document.querySelector('#nextFromRoute');
+  let map, markers = {}, routeLine, routeDistanceMeters = null;
+  let clickNext = 'from', searchTimers = {}, routeToken = 0, lastRouteRequestAt = 0, lastNominatimRequestAt = 0;
+  let currentStep = 1;
+
+  const formatMoney = value => new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(value);
+  const formatKm = value => new Intl.NumberFormat('ru-RU', { minimumFractionDigits: value % 1 > .05 ? 1 : 0, maximumFractionDigits: 1 }).format(value);
+  const helperWord = count => count === 1 ? 'грузчик' : count >= 2 && count <= 4 ? 'грузчика' : 'грузчиков';
+  const tripFields = [...document.querySelectorAll('[data-trip-detail]')];
+
+  const storage = {
+    get(key) { try { return localStorage.getItem(`cardrop-trip-${key}`); } catch { return null; } },
+    set(key, value) { try { localStorage.setItem(`cardrop-trip-${key}`, value); } catch { /* Продолжаем без сохранения между визитами. */ } }
+  };
 
   const iconFor = key => L.divIcon({ className: '', html: `<span style="display:block;width:14px;height:14px;border:3px solid #f7f5ed;border-radius:50%;${markerStyles[key]}"></span>`, iconSize: [14, 14], iconAnchor: [7, 7] });
-  const displayName = address => address.city || address.town || address.village || address.municipality || address.county || '';
+  const displayName = address => address?.city || address?.town || address?.village || address?.municipality || address?.county || '';
   const localityFromPhoton = p => p.city || p.locality || p.district || p.county || p.state || '';
+
   function placeLabel(place) {
     const address = place.address || place.properties || {};
     const street = address.road || address.pedestrian || address.residential || address.street || address.name || '';
@@ -30,16 +45,17 @@
   }
 
   function normalizePhoton(feature) {
-    const p = feature.properties || {};
+    const properties = feature.properties || {};
     const [lon, lat] = feature.geometry?.coordinates || [];
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
     const address = {
-      road: p.street || '', house_number: p.housenumber || '', city: p.city || p.locality || '',
-      town: p.city || p.locality || '', village: p.city || p.locality || '', district: p.district || '',
-      county: p.county || '', state: p.state || ''
+      road: properties.street || '', house_number: properties.housenumber || '',
+      city: properties.city || properties.locality || '', town: properties.city || properties.locality || '',
+      village: properties.city || properties.locality || '', district: properties.district || '',
+      county: properties.county || '', state: properties.state || ''
     };
-    const parts = [p.name, p.street && p.street !== p.name ? p.street : '', p.housenumber, p.city || p.locality, p.state].filter(Boolean);
-    return { lat: String(lat), lon: String(lon), address, display_name: [...new Set(parts)].join(', '), name: p.name || '' };
+    const parts = [properties.name, properties.street && properties.street !== properties.name ? properties.street : '', properties.housenumber, properties.city || properties.locality, properties.state].filter(Boolean);
+    return { lat: String(lat), lon: String(lon), address, display_name: [...new Set(parts)].join(', '), name: properties.name || '' };
   }
 
   function setRouteStatus(message, kind = '') {
@@ -48,18 +64,90 @@
     routeStatus.parentElement.classList.toggle('route-success', kind === 'success');
   }
 
+  function currentDetails() {
+    return Object.fromEntries(tripFields.map(field => [field.dataset.tripDetail, field.type === 'checkbox' ? field.checked : field.value.trim()]));
+  }
+
+  function detailsLines() {
+    const d = currentDetails();
+    const lines = [];
+    if (d.cargo) lines.push(`Груз: ${d.cargo}`);
+    if (d.weight) lines.push(`Вес: ${formatMoney(Number(d.weight))} кг`);
+    if (d.volume) lines.push(`Объём: ${d.volume} м³`);
+    const helpers = Number(d.helpers || 0);
+    lines.push(helpers ? `Грузчики: ${helpers} ${helperWord(helpers)}` : 'Без грузчиков');
+    if (d.fromFloor !== '') lines.push(`Этаж погрузки: ${d.fromFloor === '0' ? 'первый / без подъёма' : d.fromFloor === '10' ? '10-й и выше' : `${d.fromFloor}-й`}${d.fromLift ? ', есть лифт' : ', без лифта'}`);
+    if (d.toFloor !== '') lines.push(`Этаж выгрузки: ${d.toFloor === '0' ? 'первый / без подъёма' : d.toFloor === '10' ? '10-й и выше' : `${d.toFloor}-й`}${d.toLift ? ', есть лифт' : ', без лифта'}`);
+    if (d.date) lines.push(`Дата: ${new Intl.DateTimeFormat('ru-RU').format(new Date(`${d.date}T12:00:00`))}`);
+    if (d.comment) lines.push(`Комментарий: ${d.comment}`);
+    return lines;
+  }
+
+  function createMaxMessage() {
+    const km = routeDistanceMeters === null ? 'не рассчитано' : `${formatKm(routeDistanceMeters / 1000)} км`;
+    const base = routeDistanceMeters === null ? 'не рассчитана' : `${formatMoney(Math.round(routeDistanceMeters / 1000 * rate))} ₽`;
+    return [
+      'Здравствуйте! Хочу уточнить расчёт перевозки.',
+      `Маршрут: ${points.from.name} — ${points.to.name}`,
+      `Расстояние: ${km}`,
+      `Примерная базовая стоимость: ${base}`,
+      ...detailsLines(),
+      'Понимаю, что точная стоимость и дата поездки подтверждаются отдельно в переписке.'
+    ].join('\n');
+  }
+
   function renderEstimate() {
     document.querySelector('#estimateFrom').textContent = points.from.name || 'Точка отправления';
     document.querySelector('#estimateTo').textContent = points.to.name || 'Точка доставки';
-    if (routeDistanceMeters === null) {
+    const estimateDetails = detailsLines();
+    document.querySelector('#estimateDetails').textContent = estimateDetails.length > 1 ? estimateDetails.slice(0, 4).join(' · ') : 'Укажите условия груза на следующем шаге';
+    const canRoute = routeDistanceMeters !== null;
+    nextRouteButton.disabled = !canRoute;
+    if (!canRoute) {
       document.querySelector('#distanceValue').textContent = '— км';
-      document.querySelector('#priceValue').innerHTML = '— <span>₽</span>';
+      document.querySelector('#priceValue').textContent = '— ₽';
+      document.querySelector('#finalDistance').textContent = '— км';
+      document.querySelector('#finalPrice').textContent = '— ₽';
       return;
     }
+
     const km = routeDistanceMeters / 1000;
-    const kmText = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: km % 1 > .05 ? 1 : 0, maximumFractionDigits: 1 }).format(km);
-    document.querySelector('#distanceValue').textContent = `${kmText} км`;
-    document.querySelector('#priceValue').innerHTML = `${Math.round(km * rate).toLocaleString('ru-RU')} <span>₽</span>`;
+    const basePrice = Math.round(km * rate);
+    document.querySelector('#distanceValue').textContent = `${formatKm(km)} км`;
+    document.querySelector('#priceValue').textContent = `${formatMoney(basePrice)} ₽`;
+    document.querySelector('#finalDistance').textContent = `${formatKm(km)} км`;
+    document.querySelector('#finalPrice').textContent = `${formatMoney(basePrice)} ₽`;
+    document.querySelector('#finalRouteFrom').textContent = points.from.name;
+    document.querySelector('#finalRouteTo').textContent = points.to.name;
+    document.querySelector('#finalDetails').innerHTML = estimateDetails.map(line => `<span>${escapeHtml(line)}</span>`).join('');
+    const maxUrl = new URL(maxShareUrl);
+    maxUrl.searchParams.set('text', createMaxMessage());
+    document.querySelector('#maxCta').href = maxUrl.toString();
+  }
+
+  function escapeHtml(value) {
+    return value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+  }
+
+  function showStep(step, scroll = true) {
+    currentStep = step;
+    for (const page of pages) {
+      const active = Number(page.dataset.page) === step;
+      page.hidden = !active;
+      page.classList.toggle('active', active);
+    }
+    document.querySelectorAll('.wizard-progress-step').forEach(item => {
+      const number = Number(item.dataset.progress);
+      item.classList.toggle('active', number === step);
+      item.classList.toggle('complete', number < step);
+    });
+    document.querySelector('#estimateCard').classList.toggle('hidden', step === 3);
+    if (step === 1 && map) setTimeout(() => map.invalidateSize(), 80);
+    if (scroll && window.matchMedia('(max-width: 700px)').matches) document.querySelector('#calculator').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function samePoint(a, b) {
+    return Math.abs(a.lat - b.lat) < 0.00001 && Math.abs(a.lon - b.lon) < 0.00001;
   }
 
   async function requestRoadRoute() {
@@ -68,15 +156,17 @@
     if (routeLine && map) { map.removeLayer(routeLine); routeLine = null; }
     renderEstimate();
     if (!map || !points.from || !points.to) return;
+    if (samePoint(points.from, points.to)) {
+      setRouteStatus('Выберите разные точки отправления и доставки.', 'error');
+      return;
+    }
 
     const waitMs = Math.max(0, 1200 - (Date.now() - lastRouteRequestAt));
-    setRouteStatus(waitMs ? 'Обновляем автомобильный маршрут…' : 'Прокладываем автомобильный маршрут…');
+    setRouteStatus(waitMs ? 'Обновляем дорожный маршрут…' : 'Прокладываем автомобильный маршрут…');
     if (waitMs) await new Promise(resolve => setTimeout(resolve, waitMs));
     if (token !== routeToken) return;
 
     const coords = `${points.from.lon},${points.from.lat};${points.to.lon},${points.to.lat}`;
-    // Keep every road vertex from OSRM: the simplified overview can cut across
-    // bends and look like an arbitrary line at the map's current zoom.
     const url = `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coords}?overview=full&geometries=geojson&alternatives=false&steps=false`;
     lastRouteRequestAt = Date.now();
     try {
@@ -100,7 +190,7 @@
       if (token !== routeToken) return;
       routeDistanceMeters = null;
       renderEstimate();
-      setRouteStatus('Не удалось построить дорожный маршрут. Попробуйте другие точки.', 'error');
+      setRouteStatus('Не удалось построить маршрут по дорогам. Уточните адреса или выберите точки на карте.', 'error');
     }
   }
 
@@ -112,46 +202,43 @@
     if (!map) return renderEstimate();
     if (markers[key]) markers[key].setLatLng([point.lat, point.lon]);
     else markers[key] = L.marker([point.lat, point.lon], { icon: iconFor(key), keyboard: true, title: key === 'from' ? 'Точка отправления' : 'Точка доставки' }).addTo(map);
-    if (markers.from && markers.to && center) {
-      map.fitBounds(L.latLngBounds([[points.from.lat, points.from.lon], [points.to.lat, points.to.lon]]).pad(.55), { maxZoom: 7, animate: true });
-    } else if (center) map.setView([point.lat, point.lon], 7);
+    if (markers.from && markers.to && center) map.fitBounds(L.latLngBounds([[points.from.lat, points.from.lon], [points.to.lat, points.to.lon]]).pad(.55), { maxZoom: 7, animate: true });
+    else if (center) map.setView([point.lat, point.lon], 7);
     if (coordinatesChanged && markers.from && markers.to) requestRoadRoute();
     renderEstimate();
   }
 
-  async function geocode(query) {
-    const encoded = encodeURIComponent(query);
-    const photonUrl = `https://photon.komoot.io/api/?q=${encoded}&lang=ru&limit=8&lat=${points.from.lat}&lon=${points.from.lon}&countrycode=RU`;
-    const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&addressdetails=1&countrycodes=ru&q=${encoded}`;
-    const responses = await Promise.allSettled([
-      fetch(photonUrl, { headers: { 'Accept-Language': 'ru' }, signal: AbortSignal.timeout(7000) }).then(r => { if (!r.ok) throw new Error(); return r.json(); }),
-      fetch(nominatimUrl, { headers: { 'Accept-Language': 'ru' }, signal: AbortSignal.timeout(9000) }).then(r => { if (!r.ok) throw new Error(); return r.json(); })
-    ]);
-    const photon = responses[0].status === 'fulfilled' ? (responses[0].value.features || []).map(normalizePhoton).filter(Boolean) : [];
-    const nominatim = responses[1].status === 'fulfilled' ? responses[1].value : [];
-    const results = [...nominatim, ...photon];
-    const unique = new Map();
-    for (const place of results) {
-      const key = `${Number(place.lat).toFixed(5)},${Number(place.lon).toFixed(5)}`;
-      if (!unique.has(key)) unique.set(key, place);
-    }
-    if (!unique.size && responses.every(r => r.status === 'rejected')) throw new Error('Не удалось выполнить поиск');
-    return [...unique.values()].slice(0, 8);
+  async function geocodePhoton(query) {
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lang=ru&limit=8&lat=${points.from.lat}&lon=${points.from.lon}&countrycode=RU`;
+    const response = await fetch(url, { headers: { 'Accept-Language': 'ru' }, signal: AbortSignal.timeout(9000) });
+    if (!response.ok) throw new Error('Photon unavailable');
+    const json = await response.json();
+    return (json.features || []).map(normalizePhoton).filter(Boolean);
+  }
+
+  async function geocodeNominatim(query) {
+    const waitMs = Math.max(0, 1100 - (Date.now() - lastNominatimRequestAt));
+    if (waitMs) await new Promise(resolve => setTimeout(resolve, waitMs));
+    lastNominatimRequestAt = Date.now();
+    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&addressdetails=1&countrycodes=ru&q=${encodeURIComponent(query)}`;
+    const response = await fetch(url, { headers: { 'Accept-Language': 'ru' }, signal: AbortSignal.timeout(9000) });
+    if (!response.ok) throw new Error('Nominatim unavailable');
+    return response.json();
   }
 
   function showSuggestions(key, results) {
     const box = suggestions[key];
     box.replaceChildren();
     if (!results.length) {
-      const empty = document.createElement('div'); empty.className = 'suggestion'; empty.textContent = 'Ничего не найдено'; box.append(empty);
+      const empty = document.createElement('div'); empty.className = 'suggestion'; empty.textContent = 'Не нашли адрес. Уточните улицу и дом или выберите точку на карте.'; box.append(empty);
     }
     results.forEach(place => {
-      const row = document.createElement('div'); row.className = 'suggestion';
+      const row = document.createElement('button'); row.type = 'button'; row.className = 'suggestion';
       const label = placeLabel(place);
       row.textContent = place.display_name || label;
       row.title = place.display_name || label;
-      row.addEventListener('mousedown', event => {
-        event.preventDefault();
+      row.addEventListener('mousedown', event => event.preventDefault());
+      row.addEventListener('click', () => {
         setPoint(key, { name: label, lat: Number(place.lat), lon: Number(place.lon) }, true);
         box.classList.remove('open'); clickNext = key === 'from' ? 'to' : 'from';
       });
@@ -162,38 +249,54 @@
 
   async function resolveInput(key) {
     const query = inputs[key].value.trim();
-    if (!query) return;
-    if (query === points[key].name) return;
-    suggestions[key].innerHTML = '<div class="suggestion">Ищем на карте…</div>';
-    suggestions[key].classList.add('open');
+    if (!query || query === points[key].name) return true;
+    suggestions[key].replaceChildren();
+    const loading = document.createElement('div'); loading.className = 'suggestion'; loading.textContent = 'Ищем адрес…';
+    suggestions[key].append(loading); suggestions[key].classList.add('open');
     try {
-      const results = await geocode(query);
-      if (results.length) {
-        const place = results[0];
-        setPoint(key, { name: placeLabel(place), lat: Number(place.lat), lon: Number(place.lon) }, true);
-        clickNext = key === 'from' ? 'to' : 'from';
-      } else showSuggestions(key, []);
+      let results = [];
+      try { results = await geocodePhoton(query); } catch { /* Nominatim ниже — адресный fallback только по запросу пользователя. */ }
+      if (!results.length) results = await geocodeNominatim(query);
+      if (!results.length) { showSuggestions(key, []); return false; }
+      const place = results[0];
+      setPoint(key, { name: placeLabel(place), lat: Number(place.lat), lon: Number(place.lon) }, true);
+      suggestions[key].classList.remove('open');
+      clickNext = key === 'from' ? 'to' : 'from';
+      return true;
     } catch {
-      suggestions[key].innerHTML = '<div class="suggestion">Поиск временно недоступен. Попробуйте позже.</div>';
-      suggestions[key].classList.add('open');
+      suggestions[key].replaceChildren();
+      const error = document.createElement('div'); error.className = 'suggestion'; error.textContent = 'Поиск временно недоступен. Выберите точку на карте или попробуйте позже.';
+      suggestions[key].append(error); suggestions[key].classList.add('open');
+      return false;
     }
   }
 
-  async function highlightRussia() {
-    const url = 'russia.geojson';
+  async function reverseGeocode(point) {
     try {
-      const response = await fetch(url);
+      const waitMs = Math.max(0, 1100 - (Date.now() - lastNominatimRequestAt));
+      if (waitMs) await new Promise(resolve => setTimeout(resolve, waitMs));
+      lastNominatimRequestAt = Date.now();
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${point.lat}&lon=${point.lon}&zoom=18&addressdetails=1`, { headers: { 'Accept-Language': 'ru' }, signal: AbortSignal.timeout(9000) });
+      if (response.ok) {
+        const place = await response.json();
+        const label = placeLabel(place);
+        if (label) setPoint(point.key, { ...point, name: label });
+      }
+    } catch { /* Координаты выбранной точки остаются доступны. */ }
+  }
+
+  async function highlightRussia() {
+    try {
+      const response = await fetch('russia.geojson');
       if (!response.ok) throw new Error('boundary unavailable');
       const country = await response.json();
       L.geoJSON(country, { style: { color: '#72834c', weight: 1.7, opacity: .9, fillColor: '#b8cb72', fillOpacity: .18 } }).addTo(map);
-    } catch {
-      // Монохромная подложка всё ещё отделяет Россию от остальных стран.
-    }
+    } catch { /* Монохромная подложка всё ещё отделяет Россию. */ }
   }
 
   function initMap() {
     if (!window.L) {
-      document.querySelector('#mapLoading').innerHTML = 'Карта временно недоступна. Используйте поиск по городам.';
+      document.querySelector('#mapLoading').innerHTML = 'Карта временно недоступна. Используйте поиск адреса.';
       setRouteStatus('Карта временно недоступна', 'error');
       return;
     }
@@ -204,18 +307,12 @@
     }).addTo(map);
     L.control.zoom({ position: 'topright' }).addTo(map);
     highlightRussia();
-    map.on('click', async event => {
+    map.on('click', event => {
       const key = clickNext;
-      const point = { name: `Точка ${event.latlng.lat.toFixed(2)}, ${event.latlng.lng.toFixed(2)}`, lat: event.latlng.lat, lon: event.latlng.lng };
+      const point = { key, name: `Точка ${event.latlng.lat.toFixed(4)}, ${event.latlng.lng.toFixed(4)}`, lat: event.latlng.lat, lon: event.latlng.lng };
       setPoint(key, point);
       clickNext = key === 'from' ? 'to' : 'from';
-      try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${point.lat}&lon=${point.lon}&zoom=10&addressdetails=1`, { headers: { 'Accept-Language': 'ru' } });
-        if (response.ok) {
-          const data = await response.json(), label = placeLabel(data);
-          if (label) setPoint(key, { ...point, name: label });
-        }
-      } catch { /* Координаты точки уже сохранены и остаются доступны. */ }
+      reverseGeocode(point);
     });
     setPoint('from', points.from);
     setPoint('to', points.to, true);
@@ -224,87 +321,99 @@
     setTimeout(() => map.invalidateSize(), 80);
   }
 
+  function setDateMinimum() {
+    const dateField = document.querySelector('[data-trip-detail="date"]');
+    const today = new Date();
+    const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    dateField.min = localDate;
+    if (dateField.value && dateField.value < localDate) { dateField.value = ''; storage.set('date', ''); }
+  }
+
+  function hydrateTripDetails() {
+    for (const field of tripFields) {
+      const saved = storage.get(field.dataset.tripDetail);
+      if (saved !== null) field.type === 'checkbox' ? field.checked = saved === 'true' : field.value = saved;
+      field.addEventListener('input', () => {
+        storage.set(field.dataset.tripDetail, field.type === 'checkbox' ? String(field.checked) : field.value);
+        renderEstimate();
+      });
+      field.addEventListener('change', () => {
+        storage.set(field.dataset.tripDetail, field.type === 'checkbox' ? String(field.checked) : field.value);
+        renderEstimate();
+      });
+    }
+    setDateMinimum();
+  }
+
   for (const key of ['from', 'to']) {
     inputs[key].addEventListener('input', () => {
       clearTimeout(searchTimers[key]);
       const query = inputs[key].value.trim();
       if (query.length < 2) { suggestions[key].classList.remove('open'); return; }
       searchTimers[key] = setTimeout(async () => {
-        try { showSuggestions(key, await geocode(query)); }
+        try { showSuggestions(key, await geocodePhoton(query)); }
         catch { suggestions[key].classList.remove('open'); }
-      }, 550);
+      }, 450);
     });
     inputs[key].addEventListener('keydown', event => {
       if (event.key === 'Enter') { event.preventDefault(); resolveInput(key); }
       if (event.key === 'Escape') suggestions[key].classList.remove('open');
     });
-    inputs[key].addEventListener('blur', () => setTimeout(() => suggestions[key].classList.remove('open'), 120));
+    inputs[key].addEventListener('blur', () => setTimeout(() => suggestions[key].classList.remove('open'), 180));
     inputs[key].closest('.field').querySelector('.clear-input').addEventListener('click', () => {
       inputs[key].value = ''; inputs[key].focus(); suggestions[key].classList.remove('open');
     });
   }
 
+  nextRouteButton.addEventListener('click', async () => {
+    for (const key of ['from', 'to']) {
+      if (!await resolveInput(key)) return;
+    }
+    if (samePoint(points.from, points.to)) {
+      setRouteStatus('Точки отправления и доставки совпадают. Укажите разные адреса.', 'error');
+      return;
+    }
+    if (routeDistanceMeters === null) {
+      setRouteStatus('Дождитесь построения маршрута по дорогам или выберите другие точки.', 'error');
+      return;
+    }
+    showStep(2);
+  });
+
+  document.querySelectorAll('[data-prev]').forEach(button => button.addEventListener('click', () => showStep(currentStep - 1)));
+  document.querySelector('#nextToEstimate').addEventListener('click', () => {
+    const dateField = document.querySelector('[data-trip-detail="date"]');
+    if (dateField.value && dateField.value < dateField.min) {
+      dateField.setCustomValidity('Выберите сегодняшнюю или будущую дату.');
+      dateField.reportValidity();
+      return;
+    }
+    dateField.setCustomValidity('');
+    renderEstimate();
+    showStep(3);
+  });
+  document.querySelector('#editRoute').addEventListener('click', () => showStep(1));
   document.querySelector('#swapRoute').addEventListener('click', () => {
     const a = { ...points.from }, b = { ...points.to };
     setPoint('from', b); setPoint('to', a, true); clickNext = 'from';
   });
   document.querySelector('#locateMe').addEventListener('click', () => {
-    if (!navigator.geolocation) return alert('Браузер не поддерживает определение геопозиции.');
+    if (!navigator.geolocation) return setRouteStatus('Браузер не поддерживает определение геопозиции.', 'error');
     navigator.geolocation.getCurrentPosition(position => {
       const p = position.coords;
-      setPoint(clickNext, { name: 'Моя геопозиция', lat: p.latitude, lon: p.longitude }, true);
-      clickNext = clickNext === 'from' ? 'to' : 'from';
-    }, () => alert('Не удалось определить местоположение. Проверьте разрешение браузера.'));
+      const key = clickNext;
+      setPoint(key, { name: 'Моя геопозиция', lat: p.latitude, lon: p.longitude }, true);
+      clickNext = key === 'from' ? 'to' : 'from';
+    }, error => {
+      const message = error.code === 1 ? 'Доступ к геопозиции запрещён. Введите адрес вручную или выберите точку на карте.' : 'Не удалось определить геопозицию. Введите адрес вручную или выберите точку на карте.';
+      setRouteStatus(message, 'error');
+    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
   });
-  let helpers = 0;
-  const helperWord = count => count === 1 ? 'грузчик' : count >= 2 && count <= 4 ? 'грузчика' : 'грузчиков';
-  function renderHelpers() {
-    document.querySelector('#helpersCount').textContent = helpers;
-    document.querySelector('#helpersNote').textContent = helpers ? `${helpers} ${helperWord(helpers)}` : 'Не нужны';
-    document.querySelector('#helpersMinus').disabled = helpers === 0;
-    document.querySelector('#helpersPlus').disabled = helpers === 6;
-  }
-  document.querySelector('#helpersMinus').addEventListener('click', () => { helpers = Math.max(0, helpers - 1); renderHelpers(); });
-  document.querySelector('#helpersPlus').addEventListener('click', () => { helpers = Math.min(6, helpers + 1); renderHelpers(); });
-
-  const tripFields = [...document.querySelectorAll('[data-trip-detail]')];
-  const detailsSummary = document.querySelector('#detailsSummary');
-  function renderTripDetails() {
-    const values = Object.fromEntries(tripFields.map(field => [field.dataset.tripDetail, field.type === 'checkbox' ? field.checked : field.value.trim()]));
-    const cargo = [values.cargo, values.weight ? `${values.weight} кг` : '', values.volume ? `${values.volume} м³` : ''].filter(Boolean).join(' · ');
-    const floors = [values.fromFloor ? `погрузка: ${values.fromFloor} эт.` : '', values.toFloor ? `выгрузка: ${values.toFloor} эт.` : ''].filter(Boolean).join(' · ');
-    const lifts = [values.fromLift ? 'лифт на погрузке' : '', values.toLift ? 'лифт на выгрузке' : ''].filter(Boolean).join(' · ');
-    const details = [cargo, floors, lifts, values.date ? `дата: ${new Intl.DateTimeFormat('ru-RU').format(new Date(`${values.date}T12:00:00`))}` : '', values.comment ? `комментарий: ${values.comment}` : ''].filter(Boolean);
-    detailsSummary.textContent = details.join(' · ') || 'Груз, этажи и дата пока не указаны';
-  }
-  for (const field of tripFields) {
-    const saved = localStorage.getItem(`cardrop-trip-${field.dataset.tripDetail}`);
-    if (saved !== null) field.type === 'checkbox' ? field.checked = saved === 'true' : field.value = saved;
-    field.addEventListener('input', () => {
-      localStorage.setItem(`cardrop-trip-${field.dataset.tripDetail}`, field.type === 'checkbox' ? String(field.checked) : field.value);
-      renderTripDetails();
-    });
-    field.addEventListener('change', () => {
-      localStorage.setItem(`cardrop-trip-${field.dataset.tripDetail}`, field.type === 'checkbox' ? String(field.checked) : field.value);
-      renderTripDetails();
-    });
-  }
-  document.querySelector('#clearTripDetails').addEventListener('click', () => {
-    for (const field of tripFields) {
-      localStorage.removeItem(`cardrop-trip-${field.dataset.tripDetail}`);
-      if (field.type === 'checkbox') field.checked = false;
-      else field.value = '';
-    }
-    renderTripDetails();
-  });
-  renderTripDetails();
   document.querySelector('.menu-toggle').addEventListener('click', () => document.querySelector('.nav').classList.toggle('open'));
   document.querySelectorAll('.nav a').forEach(link => link.addEventListener('click', () => document.querySelector('.nav').classList.remove('open')));
 
+  hydrateTripDetails();
   renderEstimate();
-  renderHelpers();
   if (document.readyState === 'complete') initMap();
   else window.addEventListener('load', initMap, { once: true });
 })();
-
-
