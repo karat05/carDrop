@@ -64,3 +64,10 @@ html,body{overflow-x:clip}body{width:100%}.hero-art,.ambient-bg{contain:paint;ov
 .footer-author span{display:grid;place-items:center;width:22px;height:22px;border:1px solid #c8a4ff55;border-radius:50%;font-size:13px}
 .footer-author:hover{color:#eadcff!important}
 @media(max-width:760px){.footer-author{font-size:12px}}
+.estimate-limit-note{position:relative;z-index:5;margin:13px 0 12px;color:#c8b6d8;font-size:12px;line-height:1.5}
+.estimate-limit-note summary{display:inline-flex;align-items:center;gap:8px;cursor:pointer;list-style:none;color:#d8c5eb}
+.estimate-limit-note summary::-webkit-details-marker{display:none}
+.estimate-limit-note summary>span{width:19px;height:19px;display:grid;place-items:center;flex:0 0 19px;border:1px solid #c8a4ff70;border-radius:50%;font-size:12px;font-weight:800;color:#d8baff}
+.estimate-limit-note>p{display:none;position:absolute;left:0;top:calc(100% + 8px);width:min(330px,calc(100vw - 64px));margin:0;padding:13px 15px;border:1px solid #c8a4ff55;border-radius:12px;background:#211b2c;color:#f1eafa;box-shadow:0 12px 30px #0008;font-size:13px;line-height:1.6}
+.estimate-limit-note:hover>p,.estimate-limit-note:focus-within>p,.estimate-limit-note[open]>p{display:block}
+.estimate-limit-note summary:focus-visible{outline:2px solid #c8a4ff;outline-offset:3px;border-radius:3px}
