@@ -97,15 +97,15 @@
     const time = d.time || 'согласуем';
     return [
       'ЗАЯВКА НА ПЕРЕВОЗКУ', '',
-      '📍 МАРШРУТ', `Старт с базы: ${depot.name}`, `Погрузка: ${inputs.from.value.trim() || 'не указано'}`, `Доставка: ${inputs.to.value.trim() || 'не указано'}`,
+      'МАРШРУТ', `Старт с базы: ${depot.name}`, `Погрузка: ${inputs.from.value.trim() || 'не указано'}`, `Доставка: ${inputs.to.value.trim() || 'не указано'}`,
       ...(routeLegs ? [`База → погрузка: ${formatKm(routeLegs[0] / 1000)} км`, `Погрузка → доставка: ${formatKm(routeLegs[1] / 1000)} км`] : []),
       `Всего по дорогам: ${km}`, 'Возвращение на базу не включено.', '',
-      '📦 ГРУЗ И ПОГРУЗКА',
+      'ГРУЗ И ПОГРУЗКА',
       `Что перевозим: ${d.cargo || 'уточню в чате'}`,
       `Вес: ${d.weight ? `${d.weight} кг` : 'не указан'} · Объём: ${d.volume ? `${d.volume} м³` : 'не указан'}`,
       ...detailsLines().filter(line => !/^(Груз:|Вес:|Объём:|Дата:|Время:|Комментарий:)/.test(line)), '',
-      '📅 ДАТА И ПОЖЕЛАНИЯ', `Желаемая дата: ${date}`, `Удобное время: ${time}`, `Комментарий: ${d.comment || 'нет'}`, '',
-      '💰 ПРИМЕРНАЯ ЦЕНА С САЙТА', `Ориентир за дорогу: ${base}`, 'Расчёт по тарифу 50 ₽/км. Грузчики и дополнительные услуги в сумму не включены — итог согласуем лично в мессенджере.', '',
+      'ДАТА И ПОЖЕЛАНИЯ', `Желаемая дата: ${date}`, `Удобное время: ${time}`, `Комментарий: ${d.comment || 'нет'}`, '',
+      'ПРИМЕРНАЯ ЦЕНА С САЙТА', `Ориентир за дорогу: ${base}`, 'Расчёт по тарифу 50 ₽/км. Грузчики и дополнительные услуги в сумму не включены — итог согласуем лично в мессенджере.', '',
       'Здравствуйте! Прошу уточнить итоговую стоимость и свободное время для перевозки.'
     ].join('\n');
   }
@@ -501,18 +501,16 @@
     mainNav.classList.remove('open');
     menuToggle.setAttribute('aria-expanded', 'false');
     menuToggle.setAttribute('aria-label', 'Открыть меню');
-    menuToggle.textContent = '☰';
+    menuToggle.classList.remove('is-open');
   };
   menuToggle.addEventListener('click', () => {
     const isOpen = mainNav.classList.toggle('open');
     menuToggle.setAttribute('aria-expanded', String(isOpen));
     menuToggle.setAttribute('aria-label', isOpen ? 'Закрыть меню' : 'Открыть меню');
-    menuToggle.textContent = isOpen ? '×' : '☰';
+    menuToggle.classList.toggle('is-open', isOpen);
   });
   mainNav.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMobileMenu));
   document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMobileMenu(); });
-  document.querySelectorAll('.nav a').forEach(link => link.addEventListener('click', () => document.querySelector('.nav').classList.remove('open')));
-
   document.querySelector('#copyQuote').addEventListener('click', async () => {
     const message = createMaxMessage();
     const status = document.querySelector('#copyStatus');
