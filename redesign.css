@@ -12,7 +12,7 @@ html,body{overflow-x:clip}body{width:100%}.hero-art,.ambient-bg{contain:paint;ov
 @media(max-width:380px){.phone{font-size:9px}.hero-proof{margin-left:8px}.hero-proof b{font-size:12px}.hero-proof small{font-size:9px}.vehicle-specs b{font-size:19px}}
 @media(max-width:760px){.hero-proof{display:block;margin:14px 0 0}.hero-proof small{display:none}.hero-proof b{font-size:14px}.hero-art{height:270px}.van-illustration{height:230px;top:8px}}
 @media(prefers-reduced-motion:reduce){.van-illustration,.scene-city,.scene-trees,.vehicle-image img,.ambient-orb,.scene-road:after{transform:none!important}}
-.depot-card{padding:14px 16px;background:#c8a4ff0c;border:1px solid #c8a4ff32;border-radius:12px;margin-bottom:16px;display:grid;gap:6px}.depot-lock{font-size:10px;letter-spacing:.12em;color:#c8a4ff;font-weight:800}.depot-card strong{font-size:15px;line-height:1.45}.depot-card small{font-size:11px;color:var(--muted)}.depot-marker{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#c8a4ff;color:#20102e;border:2px solid white;box-shadow:0 2px 8px #0005;font:bold 13px Manrope,Arial}.route-inputs{grid-template-columns:1fr 1fr}.swap-button{position:static;transform:none;margin:0;grid-column:1/-1;order:3;width:auto;height:auto;justify-self:end;border-radius:9px;padding:8px 12px;font-size:12px;line-height:1.4}.estimate-depot{display:grid;gap:5px;margin-top:17px}.estimate-depot small{color:var(--yellow);font-size:9px;letter-spacing:.1em}.estimate-depot b{font-size:13px;line-height:1.5}.estimate-route:before{content:'↓';color:var(--yellow);font-size:13px}.leg-summary{display:grid;gap:7px;font-size:12px;color:var(--muted);margin:12px 0 15px;padding:12px 0;border-block:1px solid var(--line)}.leg-summary>span{display:flex;justify-content:space-between;gap:15px}.leg-summary b{color:var(--ink);white-space:nowrap}.leg-summary small{font-size:10px;line-height:1.5;color:#b3a1c2}.final-depot{font-size:13px;color:var(--yellow);margin-top:12px}
+.depot-card{padding:14px 16px;background:#c8a4ff0c;border:1px solid #c8a4ff32;border-radius:12px;margin-bottom:16px;display:grid;gap:6px}.depot-lock{font-size:10px;letter-spacing:.12em;color:#c8a4ff;font-weight:800}.depot-card strong{font-size:15px;line-height:1.45}.depot-card small{font-size:11px;color:var(--muted)}.depot-marker{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#c8a4ff;color:#20102e;border:2px solid white;box-shadow:0 2px 8px #0005;font:bold 13px Manrope,Arial}.route-inputs{grid-template-columns:1fr 1fr}.swap-button{position:static;transform:none;margin:0;grid-column:1/-1;order:3;width:auto;height:auto;justify-self:end;border-radius:9px;padding:8px 12px;font-size:12px;line-height:1.4}.estimate-depot{display:grid;gap:5px;margin-top:17px}.estimate-depot small{color:var(--yellow);font-size:9px;letter-spacing:.1em}.estimate-depot b{font-size:13px;line-height:1.5}.estimate-route:before{content:none}.leg-summary{display:grid;gap:7px;font-size:12px;color:var(--muted);margin:12px 0 15px;padding:12px 0;border-block:1px solid var(--line)}.leg-summary>span{display:flex;justify-content:space-between;gap:15px}.leg-summary b{color:var(--ink);white-space:nowrap}.leg-summary small{font-size:10px;line-height:1.5;color:#b3a1c2}.final-depot{font-size:13px;color:var(--yellow);margin-top:12px}
 #mapProvider{display:inline;color:#c6b8dc}
 @media(max-width:760px){.route-inputs{grid-template-columns:1fr;padding-right:0}.swap-button{position:static;transform:none;top:auto;right:auto}.depot-card strong{font-size:14px}.depot-card small{font-size:11px}.estimate-route:before{transform:rotate(-90deg)}}
 .map-frame{height:420px}
@@ -238,6 +238,26 @@ html,body{overflow-x:clip}body{width:100%}.hero-art,.ambient-bg{contain:paint;ov
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+}
+/* Consistent vector icons and a single-column date/time form on all phones. */
+.ui-icon{display:block;width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.phone-icon svg,.art-caption>b svg,.hero-cta svg,.wizard-button svg,.copy-button svg,.swap-button svg,.locate-button svg,.contact-option i svg,.footer-author svg,.privacy-home-link svg,.privacy-back svg,.privacy-contact svg{width:18px;height:18px}
+.art-caption>b{display:grid;place-items:center;color:var(--yellow)}
+.estimate-route>span{display:grid;place-items:center;color:var(--yellow)}
+.estimate-route>span svg{width:16px;height:16px}
+.final-route-arrow{display:grid;place-items:center;color:var(--yellow)}
+.final-route-arrow svg{width:18px;height:18px}
+.route-leg-arrow svg{width:20px;height:20px;margin:auto}
+.depot-lock{display:flex;align-items:center;gap:6px}
+.depot-lock svg{width:14px;height:14px}
+.copy-button,.swap-button,.locate-button,.wizard-button{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.footer-author span svg{width:14px;height:14px}
+@media(max-width:760px){
+  .date-time-grid{grid-template-columns:minmax(0,1fr)!important;gap:12px}
+  .date-time-grid>.detail-field{width:100%;min-width:0}
+  .date-time-grid input[type="date"],.date-time-grid input[type="time"]{width:100%;min-width:0;max-width:100%;display:block;-webkit-appearance:none;appearance:none;box-sizing:border-box}
+  .date-time-grid input[type="date"]::-webkit-date-and-time-value,.date-time-grid input[type="time"]::-webkit-date-and-time-value{text-align:left}
+  .phone-icon svg,.art-caption>b svg,.hero-cta svg,.wizard-button svg,.copy-button svg,.swap-button svg,.locate-button svg,.contact-option i svg{width:19px;height:19px}
 }
 .privacy-body{min-height:100vh;color:var(--ink);overflow-x:hidden}
 .privacy-topbar{position:relative;z-index:2}
