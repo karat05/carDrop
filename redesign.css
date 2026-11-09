@@ -64,13 +64,11 @@ html,body{overflow-x:clip}body{width:100%}.hero-art,.ambient-bg{contain:paint;ov
 .footer-author span{display:grid;place-items:center;width:22px;height:22px;border:1px solid #c8a4ff55;border-radius:50%;font-size:13px}
 .footer-author:hover{color:#eadcff!important}
 @media(max-width:760px){.footer-author{font-size:12px}}
-.estimate-limit-note{position:relative;z-index:5;width:100%;margin:13px 0 12px;color:#c8b6d8;font-size:12px;line-height:1.5}
-.estimate-limit-note summary{display:inline-flex;align-items:center;gap:8px;cursor:pointer;list-style:none;color:#d8c5eb}
-.estimate-limit-note summary::-webkit-details-marker{display:none}
-.estimate-limit-note summary>span{width:19px;height:19px;display:grid;place-items:center;flex:0 0 19px;border:1px solid #c8a4ff70;border-radius:50%;font-size:12px;font-weight:800;color:#d8baff}
-.estimate-limit-note>p{display:none;position:static;box-sizing:border-box;width:100%;margin:8px 0 2px;padding:12px;border:1px solid #c8a4ff55;border-radius:12px;background:#211b2c;color:#f1eafa;font-size:13px;line-height:1.6;overflow-wrap:anywhere}
-.estimate-limit-note:hover>p,.estimate-limit-note:focus-within>p,.estimate-limit-note[open]>p{display:block}
-.estimate-limit-note summary:focus-visible{outline:2px solid #c8a4ff;outline-offset:3px;border-radius:3px}
+.estimate-limit-note{position:relative;z-index:5;display:flex;align-items:flex-start;gap:10px;width:100%;box-sizing:border-box;margin:14px 0 16px;padding:12px;border:1px solid #c8a4ff55;border-radius:12px;background:#211b2c;color:#e2d8eb;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.estimate-limit-icon{width:19px;height:19px;display:grid;place-items:center;flex:0 0 19px;border:1px solid #c8a4ff70;border-radius:50%;font-size:12px;font-weight:800;color:#d8baff}
+.estimate-limit-note b{display:block;margin:0 0 3px;color:#f1eafa;font-size:12px}
+.estimate-limit-note p{margin:0;color:#c8bdd4;font-size:12px;line-height:1.55}
+.estimate-limit-note a{display:inline-block;margin-top:6px;color:#d6b8ff;font-weight:700;text-decoration:underline;text-underline-offset:2px}
 .privacy-body{min-height:100vh;color:var(--ink);overflow-x:hidden}
 .privacy-topbar{position:relative;z-index:2}
 .privacy-home-link{color:#d8c5eb;font-size:13px;font-weight:700}
