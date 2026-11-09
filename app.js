@@ -495,7 +495,22 @@
       setRouteStatus(message, 'error');
     }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
   });
-  document.querySelector('.menu-toggle').addEventListener('click', () => document.querySelector('.nav').classList.toggle('open'));
+  const menuToggle = document.querySelector('.menu-toggle');
+  const mainNav = document.querySelector('.nav');
+  const closeMobileMenu = () => {
+    mainNav.classList.remove('open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+    menuToggle.setAttribute('aria-label', 'Открыть меню');
+    menuToggle.textContent = '☰';
+  };
+  menuToggle.addEventListener('click', () => {
+    const isOpen = mainNav.classList.toggle('open');
+    menuToggle.setAttribute('aria-expanded', String(isOpen));
+    menuToggle.setAttribute('aria-label', isOpen ? 'Закрыть меню' : 'Открыть меню');
+    menuToggle.textContent = isOpen ? '×' : '☰';
+  });
+  mainNav.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMobileMenu));
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMobileMenu(); });
   document.querySelectorAll('.nav a').forEach(link => link.addEventListener('click', () => document.querySelector('.nav').classList.remove('open')));
 
   document.querySelector('#copyQuote').addEventListener('click', async () => {
