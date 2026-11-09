@@ -5,6 +5,8 @@
 **Сайт:** https://perevozki-master-ru.plaidmatch2.chatgpt.site/  
 **Автор сайта:** [@RemyMartin5 в Telegram](https://t.me/RemyMartin5)
 
+**Политика конфиденциальности:** https://perevozki-master-ru.plaidmatch2.chatgpt.site/privacy.html
+
 ## Что умеет конфигуратор
 
 - Строит автомобильный маршрут с фиксированным выездом с базы: Александров, улица Пески Набережные, 1.
@@ -40,6 +42,7 @@ python -m http.server 8000
 | Файл | Назначение |
 | --- | --- |
 | `index.html` | Разметка сайта, визарда, карты и страницы |
+| `privacy.html` | Политика конфиденциальности и описание потоков данных |
 | `app.js` | Геокодирование, маршрут, расчёт, сохранение и сборка заявки |
 | `map-setup.js` | Инициализация Leaflet и MapLibre GL |
 | `map-tiles.js` | Подложка Liberty и запасной слой OpenStreetMap |
