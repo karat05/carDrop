@@ -17,7 +17,7 @@
   const pages = [...document.querySelectorAll('.wizard-page')];
   const routeStatus = document.querySelector('#routeStatus');
   const nextRouteButton = document.querySelector('#nextFromRoute');
-  let map, markers = {}, routeLine, routeDistanceMeters = null, routeLegs = null;
+  let map, markers = {}, routeLines = [], routeDistanceMeters = null, routeLegs = null;
   let clickNext = 'from', searchTimers = {}, routeToken = 0, lastRouteRequestAt = 0, lastNominatimRequestAt = 0;
   let currentStep = 1;
 
@@ -180,11 +180,17 @@
     return Math.abs(a.lat - b.lat) < 0.00001 && Math.abs(a.lon - b.lon) < 0.00001;
   }
 
+  function clearRouteLines() {
+    if (!map) return;
+    routeLines.forEach(line => map.removeLayer(line));
+    routeLines = [];
+  }
+
   async function requestRoadRoute() {
     const token = ++routeToken;
     routeDistanceMeters = null;
     routeLegs = null;
-    if (routeLine && map) { map.removeLayer(routeLine); routeLine = null; }
+    clearRouteLines();
     renderEstimate();
     if (!map || !points.from || !points.to) return;
     if (inputs.from.value.trim() !== points.from.name || inputs.to.value.trim() !== points.to.name) {
@@ -202,7 +208,7 @@
     if (token !== routeToken) return;
 
     const coords = [depot, points.from, points.to].map(point => `${point.lon},${point.lat}`).join(';');
-    const url = `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coords}?overview=full&geometries=geojson&alternatives=false&steps=false`;
+    const url = `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coords}?overview=full&geometries=geojson&alternatives=false&steps=true`;
     lastRouteRequestAt = Date.now();
     try {
       const response = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
@@ -214,8 +220,17 @@
 
       routeDistanceMeters = route.distance;
       routeLegs = route.legs.map(leg => leg.distance);
-      const latlngs = route.geometry.coordinates.map(([lon, lat]) => [lat, lon]);
-      routeLine = L.polyline(latlngs, { color: '#648496', weight: 5, opacity: .98, smoothFactor: 0, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+      const legColors = ['#43D6A2', '#B98AFF'];
+      const legGeometries = route.legs.map(leg => (leg.steps || []).flatMap(step => step.geometry?.coordinates || []));
+      if (legGeometries.every(coordinates => coordinates.length > 1)) {
+        routeLines = legGeometries.map((coordinates, index) => L.polyline(
+          coordinates.map(([lon, lat]) => [lat, lon]),
+          { color: legColors[index], weight: 6, opacity: .98, smoothFactor: 0, lineCap: 'round', lineJoin: 'round' }
+        ).addTo(map));
+      } else {
+        const latlngs = route.geometry.coordinates.map(([lon, lat]) => [lat, lon]);
+        routeLines = [L.polyline(latlngs, { color: '#8E79B8', weight: 5, opacity: .98, smoothFactor: 0, lineCap: 'round', lineJoin: 'round' }).addTo(map)];
+      }
       for (const [key, waypoint] of [['from', result.waypoints?.[1]], ['to', result.waypoints?.[2]]]) {
         const snapped = waypoint?.location;
         if (snapped && markers[key]) markers[key].setLatLng([snapped[1], snapped[0]]);
@@ -421,7 +436,7 @@
     inputs[key].addEventListener('input', () => {
       routeToken++;
       routeDistanceMeters = null; routeLegs = null;
-      if (routeLine && map) { map.removeLayer(routeLine); routeLine = null; }
+      clearRouteLines();
       renderEstimate();
       clearTimeout(searchTimers[key]);
       const query = inputs[key].value.trim();

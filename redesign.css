@@ -458,4 +458,170 @@ footer .copyright{font-size:15px;color:#e5dced;white-space:nowrap}
  .privacy-back{font-size:13px}
 }
 
+/* Final responsive pass: keep each content block readable at phone widths. */
+.calculator-section>.section-heading{justify-content:center;text-align:center;margin:0 0 24px}
+.calculator-section>.section-heading>div{width:100%}
+.calculator-section>.section-heading .eyebrow{justify-content:center}
+.calculator-section>.section-heading h2{margin-top:14px}
+.calculator-section>.wizard-progress{margin:0 auto 18px}
+.calculator-section>.quote-toolbar>p{max-width:760px;margin-inline:auto;text-align:center}
+.map-legend{gap:14px;padding:10px 12px;border:1px solid #10151d30;border-radius:12px;background:rgba(250,250,250,.94);color:#34414b;font-size:12px;font-weight:700;box-shadow:0 4px 14px #06101b24}
+.legend-route-line{display:inline-block;width:20px;height:0;border-top:4px solid;border-radius:9px}
+.approach-line{border-color:#43d6a2}
+.loaded-line{border-color:#9a68dc}
+.handoff-head .hero-cta{min-height:46px;padding:7px 14px;gap:10px;border:1px solid #c8a4ff55;border-radius:999px;background:linear-gradient(120deg,#c8a4ff18,#ffffff06);color:#eee5f8;font-size:14px;box-shadow:none}
+.handoff-head .hero-cta:hover{background:#c8a4ff28;border-color:#c8a4ff99;transform:translateY(-1px)}
+.handoff-head .hero-cta>span{display:grid;width:30px;height:30px;place-items:center;border-radius:50%;background:#c8a4ff;color:#241632}
+.footer-creator{display:inline-flex;align-items:center;gap:7px;color:#eee7f7!important;white-space:nowrap}
+.footer-creator>span{color:inherit!important;font-size:inherit}
+.footer-creator>strong{font-weight:700;color:inherit}
+.privacy-footer .privacy-copyright{font-size:15px;color:#e5dced}
+
+@media(max-width:760px){
+ html,body{width:100%;max-width:100%;overflow-x:hidden}
+ .topbar{width:92%;height:66px;display:flex;gap:8px;justify-content:space-between}
+ .topbar>.brand{flex:0 1 auto;min-width:0;gap:7px;font-size:13px;white-space:nowrap}
+ .topbar>.brand-mark{flex:0 0 31px;width:31px;height:31px}
+ .topbar>.phone{flex:0 0 auto;min-height:42px;margin:0 0 0 auto;padding:5px 9px;gap:6px;font-size:12px}
+ .topbar>.phone-icon{width:23px;height:23px;flex-basis:23px}
+ .topbar>.menu-toggle{flex:0 0 40px;width:40px;height:40px}
+ .topbar>.nav{top:calc(100% + 6px)}
+ .hero{width:92%;padding:34px 0 54px;display:grid;grid-template-columns:minmax(0,1fr);gap:0;overflow:visible}
+ .hero-copy{padding:0;min-width:0}
+ .hero .eyebrow{font-size:10px;line-height:1.6;letter-spacing:.1em;flex-wrap:wrap}
+ .hero h1{font-size:clamp(38px,10vw,54px);line-height:1.03;overflow-wrap:anywhere}
+ .hero-text{font-size:16px;line-height:1.65}
+ .hero .hero-cta{min-height:48px}
+ .hero .hero-proof{margin-top:20px}
+ .hero-art{height:clamp(220px,65vw,290px);margin:8px 0 0;overflow:hidden}
+ .van-illustration{width:100%;height:88%;left:0;top:4%;object-fit:contain}
+ .scene-city,.scene-trees{width:100%;height:100%;top:0}
+ .scene-road{bottom:36px}
+ .art-caption{right:2%;bottom:0;max-width:90%}
+ .hero-bottom{left:0;right:0;bottom:10px;justify-content:center;gap:8px;flex-wrap:wrap;font-size:8px}
+ .hero-bottom .bottom-dash{width:16px}
+ .calculator-section,.vehicle-section,.handoff-section{width:92%;padding:32px 0}
+ .calculator-section>.section-heading{margin-bottom:22px}
+ .calculator-section>.section-heading .eyebrow{font-size:9px;line-height:1.6;letter-spacing:.1em}
+ .calculator-section>.section-heading h2{font-size:clamp(29px,8.5vw,38px);line-height:1.12;margin:12px 0 0;overflow-wrap:anywhere}
+ .calculator-section>.wizard-progress{width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(12px,.4fr) minmax(0,1fr) minmax(12px,.4fr) minmax(0,1fr);gap:5px;align-items:center;margin:0 auto 18px}
+ .wizard-progress-step{min-width:0;display:flex;align-items:center;justify-content:center;gap:6px}
+ .wizard-progress-step>span{width:34px;height:34px;flex:0 0 34px;font-size:12px}
+ .wizard-progress-step>b{font-size:11px;white-space:nowrap}
+ .wizard-progress>i{display:block;width:100%;min-width:8px}
+ .calculator-section>.quote-toolbar{display:block;margin:0 0 16px}
+ .calculator-section>.quote-toolbar>p{font-size:14px;line-height:1.55;text-align:center}
+ .quote-toolbar>div{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+ .copy-button{width:100%;min-height:48px}
+ .wizard-layout,.wizard-layout:has(.wizard-page[data-page="1"].active),.wizard-layout:has(.wizard-page[data-page="3"].active){display:grid;grid-template-columns:minmax(0,1fr)!important;gap:14px;width:100%;min-width:0;align-items:start}
+ .route-panel,.estimate-card{width:100%;min-width:0;padding:16px;border-radius:16px}
+ .wizard-page-heading{margin-bottom:17px}
+ .wizard-page-heading>span{font-size:11px}
+ .wizard-page-heading h3{font-size:22px;line-height:1.2;margin:7px 0}
+ .wizard-page-heading p{font-size:15px;line-height:1.6}
+ .depot-card{min-width:0;margin-bottom:18px}
+ .depot-card strong{font-size:14px;line-height:1.45;overflow-wrap:anywhere}
+ .depot-card small{font-size:12px;line-height:1.5}
+ .route-inputs{height:auto;width:100%;min-width:0;display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:0}
+ .route-inputs>.field:nth-of-type(1),.route-inputs>.field:nth-of-type(2){grid-column:1;grid-row:auto}
+ .field{display:grid;grid-template-columns:minmax(0,1fr);gap:5px;min-width:0}
+ .field>span{font-size:11px}
+ .input-wrap{width:100%;height:48px;margin:0;padding:0 10px}
+ .input-wrap input{min-width:0;font-size:16px}
+ .suggestions{left:0;right:0}
+ .swap-button{position:static;grid-column:1;grid-row:auto;justify-self:start;display:inline-flex;align-items:center;justify-content:center;min-height:42px;width:auto;height:auto;margin:0;padding:0 12px;transform:none;white-space:nowrap;font-size:12px}
+ .map-tools{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:14px 0 11px}
+ .map-hint{font-size:12px;line-height:1.5}
+ .locate-button{justify-self:start;min-height:38px;padding:0 10px;border:1px solid var(--line);border-radius:9px;font-size:12px}
+ .wizard-page[data-page="1"].active .map-frame,.map-frame{width:100%;height:clamp(300px,92vw,390px);min-height:300px;border-radius:12px}
+ .map-legend{left:8px;bottom:8px;gap:9px;padding:8px 9px;font-size:11px}
+ .legend-route-line{width:16px}
+ .map-footnote{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;margin-top:8px;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+ .map-data-credit{white-space:normal}
+ .wizard-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;margin-top:14px}
+ .wizard-actions .wizard-button{width:100%;min-height:48px;font-size:14px}
+ .estimate-card{position:static;overflow:hidden}
+ .estimate-route{grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);gap:5px;margin:14px 0}
+ .estimate-route-point{min-width:0;gap:5px}
+ .estimate-route-point>div{font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+ .estimate-route-point>small{font-size:11px;line-height:1.45;overflow-wrap:anywhere}
+ .estimate-route-point>small b{font-size:11px;white-space:normal}
+ .estimate-route>span{transform:none}
+ .estimate-distance,.estimate-distance b{font-size:13px}
+ .estimate-price{font-size:38px}
+ .estimate-disclaimer,.summary-note p{font-size:13px;line-height:1.6}
+ .summary-note{display:block}
+ .cargo-fields{display:grid;grid-template-columns:minmax(0,1fr);gap:13px;min-width:0}
+ .cargo-fields .detail-grid,.date-time-grid,.lift-type-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;min-width:0}
+ .cargo-fields .detail-field{min-width:0;font-size:14px;line-height:1.5}
+ .cargo-fields .detail-field input,.cargo-fields .detail-field select,.cargo-fields .detail-field textarea{width:100%;min-width:0;min-height:48px;font-size:16px}
+ .message-preview{width:100%;min-width:0;min-height:220px;font-size:14px;line-height:1.55;overflow-wrap:anywhere}
+ .route-legs{grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);gap:5px}
+ .route-leg{min-width:0;padding:9px 7px}
+ .route-leg b{font-size:15px}
+ .route-leg small{font-size:11px}
+ .vehicle-section{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+ .vehicle-image{display:block;width:100%;height:clamp(190px,55vw,245px);min-width:0}
+ .vehicle-image img{width:100%;height:100%;object-fit:contain}
+ .vehicle-info{min-width:0}
+ .vehicle-info h2{font-size:clamp(27px,8vw,34px);line-height:1.15}
+ .vehicle-info p{font-size:15px;line-height:1.65}
+ .vehicle-specs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .vehicle-specs>div{min-width:0}
+ .vehicle-specs b{font-size:21px}
+ .vehicle-specs span{font-size:12px;line-height:1.45}
+ .handoff-section{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+ .handoff-head{display:grid;grid-template-columns:minmax(0,1fr);justify-items:start;gap:12px}
+ .handoff-head .eyebrow{width:auto}
+ .handoff-head h2{font-size:32px;line-height:1.12;margin:0}
+ .handoff-head .hero-cta{min-height:44px;font-size:13px}
+ .handoff-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:0;margin:0}
+ .handoff-grid article{display:grid;grid-template-columns:minmax(0,1fr);gap:0;padding:14px 0}
+ .handoff-grid article>span{grid-row:auto;font-size:11px}
+ .handoff-grid h3{font-size:18px;margin:8px 0 5px;line-height:1.35}
+ .handoff-grid p{font-size:15px;line-height:1.65}
+ body>footer:not(.privacy-footer){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:14px 10px;width:92%;padding:18px 0 calc(26px + env(safe-area-inset-bottom));font-size:13px;line-height:1.45}
+ body>footer:not(.privacy-footer)>.brand{grid-column:1/-1;justify-self:start;font-size:14px}
+ body>footer:not(.privacy-footer)>span:not(.copyright){grid-column:1/-1}
+ body>footer:not(.privacy-footer)>a:not(.brand),body>footer:not(.privacy-footer)>.footer-creator{justify-self:start;min-width:0;white-space:normal;overflow-wrap:anywhere}
+ body>footer:not(.privacy-footer)>.copyright{grid-column:1/-1;font-size:15px}
+ .footer-creator{display:inline-flex;flex-wrap:wrap;gap:5px 7px;font-size:13px}
+ .privacy-topbar{grid-template-columns:minmax(0,1fr) auto;width:92%;height:64px;gap:8px}
+ .privacy-topbar>.brand{min-width:0;font-size:12px;gap:6px}
+ .privacy-topbar>.brand-mark{width:30px;height:30px}
+ .privacy-home-link{max-width:48vw;min-height:40px;padding:7px 10px;font-size:12px;white-space:normal;line-height:1.25}
+ .privacy-main{width:90%;min-width:0;margin:18px auto 36px}
+ .privacy-heading h1{font-size:clamp(32px,9vw,42px);line-height:1.1;overflow-wrap:anywhere}
+ .privacy-heading>p{font-size:15px;line-height:1.6}
+ .privacy-content p,.privacy-content li{font-size:15px;line-height:1.7;overflow-wrap:anywhere}
+ .privacy-contact{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;padding:15px}
+ .privacy-contact strong,.privacy-contact span,.privacy-contact>a,.privacy-contact>a:last-child{grid-column:1;grid-row:auto;justify-self:start;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+ .privacy-footer{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;width:90%;padding:16px 0 calc(24px + env(safe-area-inset-bottom));font-size:14px}
+ .privacy-footer .privacy-copyright{font-size:15px}
+}
+@media(max-width:390px){
+ .topbar>.brand{font-size:11px}
+ .topbar>.brand-mark{flex-basis:28px;width:28px;height:28px}
+ .topbar>.phone{padding-inline:7px;font-size:11px}
+ .topbar>.phone-icon{display:none}
+ .topbar>.menu-toggle{flex-basis:36px;width:36px;height:36px}
+ .hero .eyebrow{font-size:9px}
+ .calculator-section>.section-heading h2{font-size:clamp(28px,8.1vw,33px)}
+ .calculator-section>.wizard-progress{grid-template-columns:minmax(0,1fr) minmax(8px,.28fr) minmax(0,1fr) minmax(8px,.28fr) minmax(0,1fr);gap:3px}
+ .wizard-progress-step{gap:4px}
+ .wizard-progress-step>span{width:30px;height:30px;flex-basis:30px;font-size:11px}
+ .wizard-progress-step>b{font-size:10px}
+ .route-panel,.estimate-card{padding:13px}
+ .estimate-route{grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr);gap:3px}
+ .estimate-route-point>div{font-size:13px}
+ .estimate-route-point>small{font-size:10px}
+ .estimate-route-point>small b{font-size:10px}
+ .map-legend{font-size:10px;gap:7px;padding:7px 8px}
+ .legend-route-line{width:14px}
+ body>footer:not(.privacy-footer){grid-template-columns:minmax(0,1fr);gap:12px}
+ body>footer:not(.privacy-footer)>a:not(.brand),body>footer:not(.privacy-footer)>.footer-creator{grid-column:1}
+ .privacy-topbar>.brand{font-size:11px}
+ .privacy-home-link{max-width:47vw;font-size:11px}
+}
+
 
