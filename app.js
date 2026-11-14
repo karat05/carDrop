@@ -158,8 +158,8 @@
     const copyAction = document.querySelector('#copyAction');
     copyAction.hidden = step === 1;
     document.querySelector('#quoteToolbarMessage').textContent = step === 1
-      ? 'Заполните маршрут и детали — после этого можно будет скопировать заявку'
-      : 'Одна заявка для MAX или WhatsApp';
+      ? 'Укажите маршрут и параметры груза — затем посмотрите предварительную стоимость.'
+      : 'Готовая заявка для MAX или WhatsApp';
     if (step === 1) document.querySelector('#copyStatus').textContent = '';
     for (const page of pages) {
       const active = Number(page.dataset.page) === step;
@@ -342,8 +342,8 @@
     map.attributionControl.setPrefix(false);
     window.CardropMapTiles.mount(L, map, window.CARDROP_MAP_CONFIG, state => {
       document.querySelector('#mapProvider').textContent = state.provider === 'liberty'
-        ? 'Карта: OpenFreeMap · Liberty'
-        : 'Карта: OpenStreetMap · резервная подложка';
+        ? 'OpenFreeMap · Liberty'
+        : 'OpenStreetMap';
     });
     L.control.zoom({ position: 'topright' }).addTo(map);
     L.marker([depot.lat, depot.lon], {
@@ -544,3 +544,5 @@
   if (document.readyState === 'complete') initMap();
   else window.addEventListener('load', initMap, { once: true });
 })();
+
+
