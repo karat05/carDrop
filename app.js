@@ -17,7 +17,7 @@
   const pages = [...document.querySelectorAll('.wizard-page')];
   const routeStatus = document.querySelector('#routeStatus');
   const nextRouteButton = document.querySelector('#nextFromRoute');
-  let map, markers = {}, routeLine, routeDistanceMeters = null, routeLegs = null;
+  let map, markers = {}, routeLines = [], routeDistanceMeters = null, routeLegs = null;
   let clickNext = 'from', searchTimers = {}, routeToken = 0, lastRouteRequestAt = 0, lastNominatimRequestAt = 0;
   let currentStep = 1;
 
@@ -95,18 +95,30 @@
     const d = currentDetails();
     const date = d.date ? new Intl.DateTimeFormat('ru-RU').format(new Date(`${d.date}T12:00:00`)) : 'согласуем';
     const time = d.time || 'согласуем';
+    const cleanLine = value => String(value ?? '').replace(/\s+/g, ' ').trim();
     return [
-      'ЗАЯВКА НА ПЕРЕВОЗКУ', '',
-      'МАРШРУТ', `Старт с базы: ${depot.name}`, `Погрузка: ${inputs.from.value.trim() || 'не указано'}`, `Доставка: ${inputs.to.value.trim() || 'не указано'}`,
-      ...(routeLegs ? [`База → погрузка: ${formatKm(routeLegs[0] / 1000)} км`, `Погрузка → доставка: ${formatKm(routeLegs[1] / 1000)} км`] : []),
-      `Всего по дорогам: ${km}`, 'Возвращение на базу не включено.', '',
-      'ГРУЗ И ПОГРУЗКА',
-      `Что перевозим: ${d.cargo || 'уточню в чате'}`,
-      `Вес: ${d.weight ? `${d.weight} кг` : 'не указан'} · Объём: ${d.volume ? `${d.volume} м³` : 'не указан'}`,
-      ...detailsLines().filter(line => !/^(Груз:|Вес:|Объём:|Дата:|Время:|Комментарий:)/.test(line)), '',
-      'ДАТА И ПОЖЕЛАНИЯ', `Желаемая дата: ${date}`, `Удобное время: ${time}`, `Комментарий: ${d.comment || 'нет'}`, '',
-      'ПРИМЕРНАЯ ЦЕНА С САЙТА', `Ориентир за дорогу: ${base}`, 'Расчёт по тарифу 50 ₽/км. Грузчики и дополнительные услуги в сумму не включены — итог согласуем лично в мессенджере.', '',
-      'Здравствуйте! Прошу уточнить итоговую стоимость и свободное время для перевозки.'
+      'Заявка на перевозку', '',
+      'МАРШРУТ',
+      `• Выезд с базы — ${cleanLine(depot.name)}`,
+      `• Погрузка — ${cleanLine(inputs.from.value) || 'не указана'}`,
+      `• Доставка — ${cleanLine(inputs.to.value) || 'не указана'}`,
+      ...(routeLegs ? [`• До погрузки — ${formatKm(routeLegs[0] / 1000)} км`, `• С грузом — ${formatKm(routeLegs[1] / 1000)} км`] : []),
+      `• Всего по дорогам — ${km}`,
+      'Возвращение на базу в расчёт не включено.', '',
+      'ГРУЗ И УСЛОВИЯ',
+      `• Что перевозим — ${cleanLine(d.cargo) || 'уточню в чате'}`,
+      `• Вес — ${d.weight ? `${d.weight} кг` : 'не указан'}`,
+      `• Объём — ${d.volume ? `${d.volume} м³` : 'не указан'}`,
+      ...detailsLines().filter(line => /^(Грузчики:|Погрузка:|Выгрузка:)/.test(line)).map(line => `• ${cleanLine(line)}`), '',
+      'ДАТА И ПОЖЕЛАНИЯ',
+      `• Желаемая дата — ${date}`,
+      `• Удобное время — ${time}`,
+      `• Комментарий — ${cleanLine(d.comment) || 'нет'}`, '',
+      'ПРЕДВАРИТЕЛЬНАЯ СТОИМОСТЬ',
+      `• Дорога — ${base}`,
+      '• Тариф — 50 ₽/км',
+      'Грузчики и дополнительные услуги согласуются отдельно. Итоговую стоимость подтвердим в переписке.', '',
+      'Здравствуйте! Подскажите, пожалуйста, итоговую стоимость и свободное время для перевозки.'
     ].join('\n');
   }
 
@@ -121,7 +133,7 @@
     document.querySelector('#messagePreview').value = createMaxMessage();
     const message = createMaxMessage();
     const share = new URL(maxShareUrl); share.searchParams.set('text', message); document.querySelector('#maxCta').href = share.toString();
-    const whatsapp = new URL('https://wa.me/79163490715'); whatsapp.searchParams.set('text', message); document.querySelector('#waCta').href = whatsapp.toString();
+    document.querySelector('#waCta').href = `https://wa.me/79163490715?text=${encodeURIComponent(message)}`;
     const canRoute = routeDistanceMeters !== null;
     nextRouteButton.disabled = !canRoute;
     if (!canRoute) {
@@ -144,9 +156,6 @@
     const maxUrl = new URL(maxShareUrl);
     maxUrl.searchParams.set('text', createMaxMessage());
     document.querySelector('#maxCta').href = maxUrl.toString();
-    const whatsappUrl = new URL('https://wa.me/79163490715');
-    whatsappUrl.searchParams.set('text', createMaxMessage());
-    document.querySelector('#waCta').href = whatsappUrl.toString();
   }
 
   function escapeHtml(value) {
@@ -158,8 +167,8 @@
     const copyAction = document.querySelector('#copyAction');
     copyAction.hidden = step === 1;
     document.querySelector('#quoteToolbarMessage').textContent = step === 1
-      ? 'Заполните маршрут и детали — после этого можно будет скопировать заявку'
-      : 'Одна заявка для MAX или WhatsApp';
+      ? 'Укажите маршрут и параметры груза — затем посмотрите предварительную стоимость.'
+      : 'Готовая заявка для MAX или WhatsApp';
     if (step === 1) document.querySelector('#copyStatus').textContent = '';
     for (const page of pages) {
       const active = Number(page.dataset.page) === step;
@@ -180,11 +189,17 @@
     return Math.abs(a.lat - b.lat) < 0.00001 && Math.abs(a.lon - b.lon) < 0.00001;
   }
 
+  function clearRouteLines() {
+    if (!map) return;
+    routeLines.forEach(line => map.removeLayer(line));
+    routeLines = [];
+  }
+
   async function requestRoadRoute() {
     const token = ++routeToken;
     routeDistanceMeters = null;
     routeLegs = null;
-    if (routeLine && map) { map.removeLayer(routeLine); routeLine = null; }
+    clearRouteLines();
     renderEstimate();
     if (!map || !points.from || !points.to) return;
     if (inputs.from.value.trim() !== points.from.name || inputs.to.value.trim() !== points.to.name) {
@@ -202,7 +217,7 @@
     if (token !== routeToken) return;
 
     const coords = [depot, points.from, points.to].map(point => `${point.lon},${point.lat}`).join(';');
-    const url = `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coords}?overview=full&geometries=geojson&alternatives=false&steps=false`;
+    const url = `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coords}?overview=full&geometries=geojson&alternatives=false&steps=true`;
     lastRouteRequestAt = Date.now();
     try {
       const response = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
@@ -214,8 +229,17 @@
 
       routeDistanceMeters = route.distance;
       routeLegs = route.legs.map(leg => leg.distance);
-      const latlngs = route.geometry.coordinates.map(([lon, lat]) => [lat, lon]);
-      routeLine = L.polyline(latlngs, { color: '#648496', weight: 5, opacity: .98, smoothFactor: 0, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+      const legColors = ['#43D6A2', '#B98AFF'];
+      const legGeometries = route.legs.map(leg => (leg.steps || []).flatMap(step => step.geometry?.coordinates || []));
+      if (legGeometries.every(coordinates => coordinates.length > 1)) {
+        routeLines = legGeometries.map((coordinates, index) => L.polyline(
+          coordinates.map(([lon, lat]) => [lat, lon]),
+          { color: legColors[index], weight: 6, opacity: .98, smoothFactor: 0, lineCap: 'round', lineJoin: 'round' }
+        ).addTo(map));
+      } else {
+        const latlngs = route.geometry.coordinates.map(([lon, lat]) => [lat, lon]);
+        routeLines = [L.polyline(latlngs, { color: '#8E79B8', weight: 5, opacity: .98, smoothFactor: 0, lineCap: 'round', lineJoin: 'round' }).addTo(map)];
+      }
       for (const [key, waypoint] of [['from', result.waypoints?.[1]], ['to', result.waypoints?.[2]]]) {
         const snapped = waypoint?.location;
         if (snapped && markers[key]) markers[key].setLatLng([snapped[1], snapped[0]]);
@@ -342,8 +366,8 @@
     map.attributionControl.setPrefix(false);
     window.CardropMapTiles.mount(L, map, window.CARDROP_MAP_CONFIG, state => {
       document.querySelector('#mapProvider').textContent = state.provider === 'liberty'
-        ? 'Карта: OpenFreeMap · Liberty'
-        : 'Карта: OpenStreetMap · резервная подложка';
+        ? 'OpenFreeMap · Liberty'
+        : 'OpenStreetMap';
     });
     L.control.zoom({ position: 'topright' }).addTo(map);
     L.marker([depot.lat, depot.lon], {
@@ -421,7 +445,7 @@
     inputs[key].addEventListener('input', () => {
       routeToken++;
       routeDistanceMeters = null; routeLegs = null;
-      if (routeLine && map) { map.removeLayer(routeLine); routeLine = null; }
+      clearRouteLines();
       renderEstimate();
       clearTimeout(searchTimers[key]);
       const query = inputs[key].value.trim();
@@ -544,3 +568,5 @@
   if (document.readyState === 'complete') initMap();
   else window.addEventListener('load', initMap, { once: true });
 })();
+
+
