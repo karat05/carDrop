@@ -95,18 +95,30 @@
     const d = currentDetails();
     const date = d.date ? new Intl.DateTimeFormat('ru-RU').format(new Date(`${d.date}T12:00:00`)) : 'согласуем';
     const time = d.time || 'согласуем';
+    const cleanLine = value => String(value ?? '').replace(/\s+/g, ' ').trim();
     return [
-      'ЗАЯВКА НА ПЕРЕВОЗКУ', '',
-      'МАРШРУТ', `Старт с базы: ${depot.name}`, `Погрузка: ${inputs.from.value.trim() || 'не указано'}`, `Доставка: ${inputs.to.value.trim() || 'не указано'}`,
-      ...(routeLegs ? [`База → погрузка: ${formatKm(routeLegs[0] / 1000)} км`, `Погрузка → доставка: ${formatKm(routeLegs[1] / 1000)} км`] : []),
-      `Всего по дорогам: ${km}`, 'Возвращение на базу не включено.', '',
-      'ГРУЗ И ПОГРУЗКА',
-      `Что перевозим: ${d.cargo || 'уточню в чате'}`,
-      `Вес: ${d.weight ? `${d.weight} кг` : 'не указан'} · Объём: ${d.volume ? `${d.volume} м³` : 'не указан'}`,
-      ...detailsLines().filter(line => !/^(Груз:|Вес:|Объём:|Дата:|Время:|Комментарий:)/.test(line)), '',
-      'ДАТА И ПОЖЕЛАНИЯ', `Желаемая дата: ${date}`, `Удобное время: ${time}`, `Комментарий: ${d.comment || 'нет'}`, '',
-      'ПРИМЕРНАЯ ЦЕНА С САЙТА', `Ориентир за дорогу: ${base}`, 'Расчёт по тарифу 50 ₽/км. Грузчики и дополнительные услуги в сумму не включены — итог согласуем лично в мессенджере.', '',
-      'Здравствуйте! Прошу уточнить итоговую стоимость и свободное время для перевозки.'
+      'Заявка на перевозку', '',
+      'МАРШРУТ',
+      `• Выезд с базы — ${cleanLine(depot.name)}`,
+      `• Погрузка — ${cleanLine(inputs.from.value) || 'не указана'}`,
+      `• Доставка — ${cleanLine(inputs.to.value) || 'не указана'}`,
+      ...(routeLegs ? [`• До погрузки — ${formatKm(routeLegs[0] / 1000)} км`, `• С грузом — ${formatKm(routeLegs[1] / 1000)} км`] : []),
+      `• Всего по дорогам — ${km}`,
+      'Возвращение на базу в расчёт не включено.', '',
+      'ГРУЗ И УСЛОВИЯ',
+      `• Что перевозим — ${cleanLine(d.cargo) || 'уточню в чате'}`,
+      `• Вес — ${d.weight ? `${d.weight} кг` : 'не указан'}`,
+      `• Объём — ${d.volume ? `${d.volume} м³` : 'не указан'}`,
+      ...detailsLines().filter(line => /^(Грузчики:|Погрузка:|Выгрузка:)/.test(line)).map(line => `• ${cleanLine(line)}`), '',
+      'ДАТА И ПОЖЕЛАНИЯ',
+      `• Желаемая дата — ${date}`,
+      `• Удобное время — ${time}`,
+      `• Комментарий — ${cleanLine(d.comment) || 'нет'}`, '',
+      'ПРЕДВАРИТЕЛЬНАЯ СТОИМОСТЬ',
+      `• Дорога — ${base}`,
+      '• Тариф — 50 ₽/км',
+      'Грузчики и дополнительные услуги согласуются отдельно. Итоговую стоимость подтвердим в переписке.', '',
+      'Здравствуйте! Подскажите, пожалуйста, итоговую стоимость и свободное время для перевозки.'
     ].join('\n');
   }
 
@@ -121,7 +133,7 @@
     document.querySelector('#messagePreview').value = createMaxMessage();
     const message = createMaxMessage();
     const share = new URL(maxShareUrl); share.searchParams.set('text', message); document.querySelector('#maxCta').href = share.toString();
-    const whatsapp = new URL('https://wa.me/79163490715'); whatsapp.searchParams.set('text', message); document.querySelector('#waCta').href = whatsapp.toString();
+    document.querySelector('#waCta').href = `https://wa.me/79163490715?text=${encodeURIComponent(message)}`;
     const canRoute = routeDistanceMeters !== null;
     nextRouteButton.disabled = !canRoute;
     if (!canRoute) {
@@ -144,9 +156,6 @@
     const maxUrl = new URL(maxShareUrl);
     maxUrl.searchParams.set('text', createMaxMessage());
     document.querySelector('#maxCta').href = maxUrl.toString();
-    const whatsappUrl = new URL('https://wa.me/79163490715');
-    whatsappUrl.searchParams.set('text', createMaxMessage());
-    document.querySelector('#waCta').href = whatsappUrl.toString();
   }
 
   function escapeHtml(value) {

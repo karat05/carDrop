@@ -631,4 +631,16 @@ footer .copyright{font-size:15px;color:#e5dced;white-space:nowrap}
 .hero-phone .ui-icon{width:19px;height:19px;fill:none;stroke:#d6b9ff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:760px){.hero-actions{gap:9px 10px;margin-top:18px}.hero-actions>.hero-cta{min-height:48px}.hero-phone{min-height:48px;padding-inline:13px;font-size:14px}}
 
+@media(max-width:760px){
+ .topbar>.menu-toggle{display:grid;place-items:center;padding:0;line-height:0}
+ .menu-toggle svg{width:22px;height:22px;overflow:hidden}
+ .menu-toggle .menu-line{transform-box:view-box;transform-origin:center center;stroke-width:1.7}
+ .menu-toggle.is-open .menu-line-top{transform:translateY(5px) rotate(45deg)}
+ .menu-toggle.is-open .menu-line-bottom{transform:translateY(-5px) rotate(-45deg)}
+ .estimate-route>span{align-self:start;justify-self:center;margin-top:1px;line-height:0;transform:none}
+ .estimate-route>span svg{display:block;width:18px;height:18px;margin:0}
+ .privacy-heading h1{font-size:clamp(26px,7.5vw,31px);line-height:1.15;letter-spacing:-.045em;overflow-wrap:normal;word-break:normal;hyphens:none}
+ .privacy-heading h1 span{display:block;white-space:nowrap}
+}
+
 
