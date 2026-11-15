@@ -624,4 +624,11 @@ footer .copyright{font-size:15px;color:#e5dced;white-space:nowrap}
  .privacy-home-link{max-width:47vw;font-size:11px}
 }
 
+.hero-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:22px}
+.hero-actions>.hero-cta{margin:0}
+.hero-phone{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;padding:7px 14px;border:1px solid #c8a4ff55;border-radius:999px;background:linear-gradient(120deg,#c8a4ff18,#ffffff06);color:#eee5f8;font-size:14px;font-weight:800;line-height:1.2;white-space:nowrap;transition:background .2s,border-color .2s,transform .2s}
+.hero-phone:hover{background:#c8a4ff28;border-color:#c8a4ff99;transform:translateY(-1px)}
+.hero-phone .ui-icon{width:19px;height:19px;fill:none;stroke:#d6b9ff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:760px){.hero-actions{gap:9px 10px;margin-top:18px}.hero-actions>.hero-cta{min-height:48px}.hero-phone{min-height:48px;padding-inline:13px;font-size:14px}}
+
 
